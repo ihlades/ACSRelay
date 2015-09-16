@@ -38,6 +38,9 @@ public:
      * @param ini_fn Name of file containing configuration options in INI format.
      */
     void ReadConfiguration ( std::string ini_fn );
+    void SetRemotePort ( const unsigned int port ) { mRemotePort = port; }
+    void SetLocalPort ( const unsigned int port ) { mLocalPort = port; }
+    void SetRelayPort ( const unsigned int port ) { mRelayPort = port; }
     /**
      * @brief Adds a plugin in the specified list.
      * @param plugin Pointer to a PluginHandler object associated with a plugin.
