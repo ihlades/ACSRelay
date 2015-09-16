@@ -4,6 +4,7 @@
 #include <pluginhandler.h>
 #include <ACSProtocol.h>
 #include <Socket.h>
+#include "tcpsocket.h"
 
 #ifdef DEBUG
     #include <fstream>
@@ -43,6 +44,11 @@ public:
      */
     void AddPlugin ( PluginHandler *plugin );
     /**
+     * @brief Adds a remote relay in the specified list.
+     * @param plugin Pointer to a PluginHandler object associated with a relay.
+     */
+    void AddRelay ( PluginHandler *relay );
+    /**
      * @brief Monitors traffic between AC Server and UDP plugins.
      */
     void Start ();
@@ -73,14 +79,27 @@ private:
     void OutputPacket ( const char* msg, long n );
 #endif
     
+    // ENUMS
+    
+    enum ServerType
+    {
+        RELAY,
+        AC
+    };
+    
     // VARS
     
     static ACSRelay* mInstance;
     
+    ServerType mServerType;
+    
+    std::string mHost;
     unsigned int mLocalPort;
     unsigned int mRemotePort;
+    unsigned int mRelayPort;
     int mMaxFd;
     Socket* mServerSocket;
+    TCPSocket* mRelaySocket;
     
     std::map< int, PluginHandler* > mPlugins;
     

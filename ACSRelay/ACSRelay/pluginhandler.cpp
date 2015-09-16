@@ -1,9 +1,24 @@
 #include "pluginhandler.h"
 
+#include "udpsocket.h"
+
 PluginHandler::PluginHandler ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port )
 {
     mName = name;
-    mSocket = new Socket ( host, local_port, remote_port );
+    mSocket = new UDPSocket ( host, local_port, remote_port );
+    
+    mCarUpdateInterval = 0;
+    
+    for ( unsigned short i = 0; i < 64; i += 1 )
+    {
+        mRequestedCarInfo[ i ] = mRequestedSessionInfo[ i ] = false;
+    }
+}
+
+PluginHandler::PluginHandler ( const std::string name, Socket* socket )
+{
+    mName = name;
+    mSocket = socket;
     
     mCarUpdateInterval = 0;
     

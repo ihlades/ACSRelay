@@ -17,31 +17,22 @@
 #endif
 
 /**
- * @brief Class that provides basic communication on an UDP socket.
+ * @brief Class that provides basic abstraction over socket communcation.
  *        It holds information about the other device such as
- *        its address and its UDP port, and also the local socket
+ *        its address and its remote port, and also the local socket
  *        file descriptor. This class also provides methods to
- *        send information through the socket.
+ *        send and receive information through the socket.
+ *
+ *        This is a pure virtual class so it can't be instantiated.
+ *        Instead, use one of its subclasses (TCPSocket and UDPSocket).
  */
 class Socket {
     
 public:
-
-    // CTOR
     
-    /**
-     * @brief Socket object constructor
-     * @param local_port Port on which to listen as a long integer.
-     */
-    Socket ( const unsigned int local_port );
-    /**
-     * @brief Socket object constructor
-     * @param host Hostname of the UDP correspondent.
-     * @param local_port Port on which to listen as a long integer.
-     * @param remote_port Port on which to send as a long integer.
-     */
-    Socket ( const std::string host, const unsigned int local_port, const unsigned int remote_port );
-    virtual ~Socket() {}
+    // CTOR/DCTOR
+    
+    virtual ~Socket () = 0;
     
     // METHODS
     
@@ -90,24 +81,21 @@ public:
      * @param port Port as a long integer.
      */
     void SetRemotePort ( const unsigned int port ) { mRemotePort = port; mCa.sin_port = htons ( port ); }
-    
     /**
-     * @brief Sends a message on the socket. Note that it is
-     *        required to set the address beforehand, either
-     *        via SetAddress() or via SetHost().
-     * @param msg Byte array to send.
-     * @param len Length of the byte array.
+     * @brief Send bytes through the socket.
+     * @param msg Array containing bytes.
+     * @param len Number of bytes in the array.
+     * @return -1 on error, otherwise the number of sent bytes.
      */
-    void Send ( const char* msg, const size_t len ) const;
-    
-private:
-
-    // CTOR
-    
+    virtual long Send ( const char* msg, const size_t len ) const = 0;
     /**
-     * @brief Socket object constructor.
+     * @brief Read bytes from the socket (if any available).
+     * @param msg Pointer to a byte array to hold the incoming data.
+     * @param len Maximum number of bytes to read.
+     * @return -1 on error, otherwise the number of read bytes.
      */
-    Socket () {}
+    virtual long Read ( char *msg, const size_t len ) = 0;
+protected:
     
     // VARS
     

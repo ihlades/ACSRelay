@@ -27,6 +27,16 @@ public:
      * @param port UDP plugin port as a long integer.
      */
     PluginHandler ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port );
+    /**
+     * @brief PluginHandler object constructor
+     * @param name Name of the plugin. Currently not used.
+     * @param socket Pointer to a Socket object that will be used
+     *        for communication.
+     */
+    PluginHandler ( const std::string name, Socket* socket );
+    /**
+     * @brief Implicit PluginHandler object constructor
+     */
     PluginHandler () { mSocket = NULL; mCarUpdateInterval = 0; }
     virtual ~PluginHandler()
     {
@@ -34,7 +44,15 @@ public:
             delete mSocket;
     }
     
+    /**
+     * @brief Getter for the PluginHandler's identifier (name).
+     * @return Name as a string.
+     */
     std::string Name () const { return mName; }
+    /**
+     * @brief Setter for the PluginHandler's identifier (name).
+     * @param name Name as a string.
+     */
     void SetName ( const std::string name ) { mName = name; }
     
     /**

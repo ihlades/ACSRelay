@@ -4,6 +4,10 @@
 #include <string>
 #include <list>
 
+/**
+ * @brief Helper class that reads the command line paramters
+ *        and provides methods to retrieve them.
+ */
 class CMDParams
 {
 public:
@@ -29,6 +33,7 @@ public:
     std::list < PluginParams > Plugins () const { return mPlugins; }
     unsigned int RemotePort () const { return mRemotePort; }
     unsigned int LocalPort () const { return mLocalPort; }
+    unsigned int RelayPort () const { return mRelayPort; }
     
 private:
     CMDParams ();
@@ -39,6 +44,7 @@ private:
     std::list <PluginParams> mPlugins;
     unsigned int mLocalPort;
     unsigned int mRemotePort;
+    unsigned int mRelayPort;
 };
 
 #endif // __CMDPARAMS_H

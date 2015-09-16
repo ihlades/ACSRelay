@@ -49,9 +49,14 @@ int main(int argc, char **argv)
         relay -> SetRemotePort ( params -> RemotePort () );
     }
      
-     if ( params -> LocalPort() != 0 )
+    if ( params -> LocalPort() != 0 )
+    {
+    relay -> SetLocalPort ( params -> LocalPort () );
+    }
+     
+     if ( params -> RelayPort() != 0 )
      {
-     relay -> SetLocalPort ( params -> LocalPort () );
+     relay -> SetRelayPort ( params -> LocalPort () );
      }
     */
     
