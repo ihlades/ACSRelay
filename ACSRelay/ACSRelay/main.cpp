@@ -37,13 +37,6 @@ int main(int argc, char **argv)
         relay -> AddPlugin( new PluginHandler ( p -> name, p -> address, p -> listen_port, p -> port ) );
     }
     
-    // Ignore port from configuration file
-    // if a command line parameter specified
-    // another one.
-    //
-    // TODO: Add SetRemotePort() and SetLocalPort()
-    //       method to ACSRelay.
-    /*
     if ( params -> RemotePort() != 0 )
     {
         relay -> SetRemotePort ( params -> RemotePort () );
@@ -54,11 +47,10 @@ int main(int argc, char **argv)
     relay -> SetLocalPort ( params -> LocalPort () );
     }
      
-     if ( params -> RelayPort() != 0 )
-     {
-     relay -> SetRelayPort ( params -> LocalPort () );
-     }
-    */
+    if ( params -> RelayPort() != 0 )
+    {
+    relay -> SetRelayPort ( params -> RelayPort () );
+    }
     
     delete params;
     
