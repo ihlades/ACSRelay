@@ -1,6 +1,6 @@
 #####################################
 #                                   #
-#      ACSRelay 1.0 readme file     #
+#      ACSRelay 0.0 readme file     #
 #                                   #
 #####################################
 
@@ -239,5 +239,4 @@ UDP_PLUGIN_LOCAL_PORT=9500
 | 4. Changelog |
 +--------------+
 
-1.0:
-    Initial release
+TBD
