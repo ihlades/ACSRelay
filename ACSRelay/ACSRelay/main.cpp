@@ -8,6 +8,7 @@ int main(int argc, char **argv)
 {
     ACSRelay *relay = ACSRelay::Build ();
     CMDParams *params = new CMDParams ( argc, argv );
+    std::list <CMDParams::PluginParams> plugins;
     
     std::string config_filename;
     
@@ -32,7 +33,9 @@ int main(int argc, char **argv)
     
     // Add plugins from command line parameters.
     
-    for ( auto p = params -> Plugins().begin (); p != params -> Plugins().end(); ++p )
+    plugins = params -> Plugins();
+    
+    for ( auto p = plugins.begin (); p != plugins.end(); ++p )
     {
         relay -> AddPeer( new PeerConnection ( p -> name, p -> address, p -> listen_port, p -> port ) );
     }
