@@ -1,7 +1,7 @@
 #include <string>
 
 #include <INIReader.h>
-#include <pluginhandler.h>
+#include <peerconnection.h>
 #include <ACSProtocol.h>
 #include <Socket.h>
 #include "tcpsocket.h"
@@ -45,12 +45,7 @@ public:
      * @brief Adds a plugin in the specified list.
      * @param plugin Pointer to a PluginHandler object associated with a plugin.
      */
-    void AddPlugin ( PluginHandler *plugin );
-    /**
-     * @brief Adds a remote relay in the specified list.
-     * @param plugin Pointer to a PluginHandler object associated with a relay.
-     */
-    void AddRelay ( PluginHandler *relay );
+    void AddPeer ( PeerConnection *plugin );
     /**
      * @brief Monitors traffic between AC Server and UDP plugins.
      */
@@ -71,7 +66,7 @@ private:
      * @brief Reads, interprets and relays datagrams coming from an UDP plugin.
      * @param plugin Pointer to a Plugin object, associated with the UDP plugin that generated the datagram.
      */
-    void RelayFromPlugin ( PluginHandler* plugin );
+    void RelayFromPlugin ( PeerConnection* plugin );
     /**
      * @brief Reads, interprets and relays datagrams coming from the AC Server.
      */
@@ -104,7 +99,7 @@ private:
     Socket* mServerSocket;
     TCPSocket* mRelaySocket;
     
-    std::map< int, PluginHandler* > mPlugins;
+    std::map< int, PeerConnection* > mPeers;
     
     unsigned long mMri;
     

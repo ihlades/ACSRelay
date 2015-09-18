@@ -1,8 +1,8 @@
-#include "pluginhandler.h"
+#include "peerconnection.h"
 
 #include "udpsocket.h"
 
-PluginHandler::PluginHandler ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port )
+PeerConnection::PeerConnection ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port )
 {
     mName = name;
     mSocket = new UDPSocket ( host, local_port, remote_port );
@@ -15,7 +15,7 @@ PluginHandler::PluginHandler ( const std::string name, const std::string host, c
     }
 }
 
-PluginHandler::PluginHandler ( const std::string name, Socket* socket )
+PeerConnection::PeerConnection ( const std::string name, Socket* socket )
 {
     mName = name;
     mSocket = socket;
@@ -28,12 +28,12 @@ PluginHandler::PluginHandler ( const std::string name, Socket* socket )
     }
 }
 
-void PluginHandler::CarUpdateArrived ( const short cid )
+void PeerConnection::CarUpdateArrived ( const short cid )
 {
     mLastUpdate[ cid ] = Clock::now ();
 }
 
-bool PluginHandler::IsWaitingCarUpdate ( const short cid )
+bool PeerConnection::IsWaitingCarUpdate ( const short cid )
 {
     if ( mCarUpdateInterval == 0 )
         return false;

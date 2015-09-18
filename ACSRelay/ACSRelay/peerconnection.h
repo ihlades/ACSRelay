@@ -12,7 +12,7 @@
  *        waiting for and provides a socket on which to communicate
  *        with the UDP plugin.
  */
-class PluginHandler {
+class PeerConnection {
     
     typedef std::chrono::high_resolution_clock Clock;
     typedef std::chrono::time_point<Clock> Time;
@@ -26,22 +26,21 @@ public:
      * @param host UDP plugin address as a string.
      * @param port UDP plugin port as a long integer.
      */
-    PluginHandler ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port );
+    PeerConnection ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port );
     /**
      * @brief PluginHandler object constructor
      * @param name Name of the plugin. Currently not used.
      * @param socket Pointer to a Socket object that will be used
      *        for communication.
      */
-    PluginHandler ( const std::string name, Socket* socket );
+    PeerConnection ( const std::string name, Socket* socket );
     /**
      * @brief Implicit PluginHandler object constructor
      */
-    PluginHandler () { mSocket = NULL; mCarUpdateInterval = 0; }
-    virtual ~PluginHandler()
+    PeerConnection () { mSocket = NULL; mCarUpdateInterval = 0; }
+    virtual ~PeerConnection()
     {
-        if ( mSocket != NULL )
-            delete mSocket;
+        delete mSocket;
     }
     
     /**

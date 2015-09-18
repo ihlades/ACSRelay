@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     
     for ( auto p = params -> Plugins().begin (); p != params -> Plugins().end(); ++p )
     {
-        relay -> AddPlugin( new PluginHandler ( p -> name, p -> address, p -> listen_port, p -> port ) );
+        relay -> AddPeer( new PeerConnection ( p -> name, p -> address, p -> listen_port, p -> port ) );
     }
     
     if ( params -> RemotePort() != 0 )
