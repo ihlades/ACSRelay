@@ -32,7 +32,7 @@ public:
     
     // CTOR/DCTOR
     
-    virtual ~Socket () = 0;
+    virtual ~Socket () {};
     
     // METHODS
     
