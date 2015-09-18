@@ -103,6 +103,8 @@ private:
     
     unsigned long mMri;
     
+    const static unsigned short mTCPTimeout = 5;
+    
 #ifdef DEBUG
     std::ofstream dOut;
 #endif

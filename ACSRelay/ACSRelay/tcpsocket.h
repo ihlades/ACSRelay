@@ -64,9 +64,10 @@ public:
     int Accept ();
     /**
      * @brief Wrapper around the standard connect() C function.
-     * @return Same values as connect()
+     * @param timeout Number of seconds after which the connection will timeout.
+     * @return Negative value on error, 0 on successful connection.
      */
-    int Connect ();
+    int Connect ( unsigned short timeout );
     
 private:
     

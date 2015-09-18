@@ -1,6 +1,8 @@
 #include "tcpsocket.h"
 
+#include <fcntl.h>
 #include <iostream>
+#include <unistd.h>
 
 long TCPSocket::Send ( const char* msg, const size_t len ) const
 {
@@ -24,9 +26,61 @@ int TCPSocket::Accept()
     return retval;
 }
 
-int TCPSocket::Connect()
+int TCPSocket::Connect( unsigned short timeout )
 {
-    return connect ( mSockFd, (struct sockaddr*) &mCa, sizeof ( mCa ) );
+    fd_set rd, wr;
+    long status;
+    struct timeval tv;
+    int err;
+    socklen_t len = sizeof ( int );
+    int opts;
+    
+    tv.tv_sec = timeout;
+    tv.tv_usec = 0;
+    
+    FD_ZERO ( &rd );
+    FD_SET ( mSockFd, &rd );
+    FD_ZERO ( &wr );
+    FD_SET ( mSockFd, &wr );
+    
+    fcntl ( mSockFd, F_SETFL, O_NONBLOCK );
+    
+    
+    if ( ( status = connect ( mSockFd, (struct sockaddr*) &mCa, sizeof ( mCa ) ) ) == -1 )
+    {
+        if ( errno != EINPROGRESS )
+        {
+            return (int) status;
+        }
+    }
+    
+    status = select (mSockFd + 1, &rd, &wr, NULL, &tv);
+    
+    if ( !FD_ISSET ( mSockFd, &rd ) && !FD_ISSET ( mSockFd, &wr ) )
+    {
+        return -2;
+    }
+    
+    if ( getsockopt ( mSockFd, SOL_SOCKET, SO_ERROR, &err, &len ) < 0)
+    {
+        return -2;
+    }
+    
+    if ( errno == 0 )
+    {
+        // TCP connection established.
+        // Make the socket blocking again...
+        
+        opts = fcntl (mSockFd, F_GETFL );
+        opts = opts & ( ~O_NONBLOCK );
+        fcntl ( mSockFd, F_SETFL, opts );
+        
+        // And return from the function.
+        
+        return 0;
+    }
+    
+    return -1;
 }
 
 TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
