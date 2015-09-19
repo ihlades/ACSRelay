@@ -1,3 +1,4 @@
+#include "log.h"
 #include "udpsocket.h"
 
 #include <iostream>
@@ -39,7 +40,7 @@ UDPSocket::UDPSocket ( const std::string host, const unsigned int local_port, co
     
     if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
     {
-        std::cerr << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort << std::endl;
+        Log::e() << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort;
     }
     
     // Now save host and port information in mCa
@@ -66,7 +67,7 @@ UDPSocket::UDPSocket ( const unsigned int local_port )
     
     if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
     {
-        std::cerr << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort << std::endl;
+        Log::e() << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort;
     }
     
     memset ( &mCa, 0, sizeof ( mCa ) );

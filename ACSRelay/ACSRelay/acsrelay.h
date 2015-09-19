@@ -72,10 +72,7 @@ private:
      */
     void RelayFromServer ();
     
-#ifdef DEBUG
-    void OutputString ( const std::string msg );
     void OutputPacket ( const char* msg, long n );
-#endif
     
     // ENUMS
     

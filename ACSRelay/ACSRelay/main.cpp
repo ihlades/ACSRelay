@@ -1,6 +1,7 @@
 #include "acsrelay.h"
 #include "cmdparams.h"
 #include "software.h"
+#include "log.h"
 
 #include <iostream>
 
@@ -12,11 +13,14 @@ int main(int argc, char **argv)
     
     std::string config_filename;
     
-    std::cout << SW_NAME << " version " << SW_VERSION << "." << std::endl;
-    
-#ifdef DEBUG
-    std::cout << "Debug output is enabled." << std::endl;
+#ifdef _DEBUG
+    Log::Start ( Log::OutputLevel::DEBUG, Log::DEFAULT_LOG_FILE );
+#else
+    Log::Start ( Log::OutputLevel::NORMAL, Log::DEFAULT_LOG_FILE );
 #endif
+    
+    Log::i() << SW_NAME << " version " << SW_VERSION << ".";
+    Log::d() << "Debug output is enabled.";
     
     // Determine configuration file name. The default value is declared in "software.h".
     
@@ -47,12 +51,12 @@ int main(int argc, char **argv)
      
     if ( params -> LocalPort() != 0 )
     {
-    relay -> SetLocalPort ( params -> LocalPort () );
+        relay -> SetLocalPort ( params -> LocalPort () );
     }
      
     if ( params -> RelayPort() != 0 )
     {
-    relay -> SetRelayPort ( params -> RelayPort () );
+        relay -> SetRelayPort ( params -> RelayPort () );
     }
     
     delete params;
@@ -60,6 +64,8 @@ int main(int argc, char **argv)
     relay -> Start ();
     
     delete relay;
+    
+    Log::Stop();
     
 	return 0;
 }

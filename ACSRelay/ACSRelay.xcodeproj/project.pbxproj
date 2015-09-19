@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		78077F5D1BA94B6400B36062 /* udpsocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78077F5C1BA94B6400B36062 /* udpsocket.cpp */; };
 		78077F601BA94F6400B36062 /* tcpsocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78077F5F1BA94F6400B36062 /* tcpsocket.cpp */; };
+		784F012D1BADB67100C591FA /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 784F012C1BADB67100C591FA /* log.cpp */; };
 		78711E141B7BC5F6002A7C7B /* settings.ini in CopyFiles */ = {isa = PBXBuildFile; fileRef = 78711E131B7BC5BA002A7C7B /* settings.ini */; };
 		7887CC971B790CE90092C4C1 /* inet_help.c in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC951B790CE90092C4C1 /* inet_help.c */; };
 		7887CCA21B790CF80092C4C1 /* acsrelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC991B790CF80092C4C1 /* acsrelay.cpp */; };
@@ -38,6 +39,8 @@
 		78077F5C1BA94B6400B36062 /* udpsocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = udpsocket.cpp; sourceTree = "<group>"; };
 		78077F5E1BA94F2900B36062 /* tcpsocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tcpsocket.h; sourceTree = "<group>"; };
 		78077F5F1BA94F6400B36062 /* tcpsocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcpsocket.cpp; sourceTree = "<group>"; };
+		784F012B1BADB20900C591FA /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		784F012C1BADB67100C591FA /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
 		78711E131B7BC5BA002A7C7B /* settings.ini */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = settings.ini; sourceTree = "<group>"; };
 		7887CC8D1B790C5D0092C4C1 /* ACSRelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ACSRelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		7887CC951B790CE90092C4C1 /* inet_help.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inet_help.c; sourceTree = "<group>"; };
@@ -89,6 +92,8 @@
 			children = (
 				7887CC981B790CF80092C4C1 /* ACSProtocol.h */,
 				7887CC991B790CF80092C4C1 /* acsrelay.cpp */,
+				784F012B1BADB20900C591FA /* log.h */,
+				784F012C1BADB67100C591FA /* log.cpp */,
 				7887CC9A1B790CF80092C4C1 /* acsrelay.h */,
 				78B2B9CB1B970551009F04CF /* cmdparams.cpp */,
 				78B2B9CA1B9703AB009F04CF /* cmdparams.h */,
@@ -167,6 +172,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				784F012D1BADB67100C591FA /* log.cpp in Sources */,
 				78077F5D1BA94B6400B36062 /* udpsocket.cpp in Sources */,
 				7887CCA51B790CF80092C4C1 /* peerconnection.cpp in Sources */,
 				7887CC971B790CE90092C4C1 /* inet_help.c in Sources */,
@@ -218,7 +224,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"_DEBUG=1",
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;

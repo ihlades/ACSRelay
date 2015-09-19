@@ -1,3 +1,4 @@
+#include "log.h"
 #include "tcpsocket.h"
 
 #include <fcntl.h>
@@ -102,7 +103,7 @@ TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
     
     if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
     {
-        std::cerr << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort << std::endl;
+        Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
     }
     
     // Now save host and port information in mCa
@@ -157,12 +158,12 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
         
         if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
         {
-            std::cerr << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort << std::endl;
+            Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
         }
         
         if ( listen ( mSockFd, 5 ) < 0 )
         {
-            std::cerr << "Failed to listen on TCP port " << mLocalPort << std::endl;
+            Log::e() << "Failed to listen on TCP port " << mLocalPort;
         }
         
         memset ( &mCa, 0, sizeof ( mCa ) );
