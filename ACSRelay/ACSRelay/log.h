@@ -4,6 +4,18 @@
 #include <fstream>
 #include <string>
 
+class LogPacket
+{
+public:
+    LogPacket ( char* msg, long len ) { mMsg = strndup ( msg, len ); mLen = len; };
+    std::string ToString () const;
+private:
+    char *mMsg;
+    long mLen;
+    
+    
+};
+
 class Log
 {
 public:
@@ -42,6 +54,8 @@ public:
     Log& operator<< ( const unsigned int &log ) { return *this << ( unsigned long long ) log; }
     Log& operator<< ( const unsigned short &log ) { return *this << ( unsigned long long ) log; }
     
+    Log& operator<< ( const LogPacket& packet ) { *this << packet.ToString(); return *this; }
+    
     const static enum OutputLevel DEFAULT_LOG_LEVEL;
     const static std::string DEFAULT_LOG_FILE;
     
@@ -63,7 +77,6 @@ private:
     enum OutputLevel mRequestedLevel;
     
     bool mTreatWarningsAsErrors;
-    
 };
 
 #endif // __LOG_H
