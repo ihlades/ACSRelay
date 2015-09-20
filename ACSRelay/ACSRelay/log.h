@@ -32,6 +32,8 @@ public:
     Log& operator<< ( const double &log );
     Log& operator<< ( const bool &log );
     
+    Log& operator<< ( const char *log ) { return *this << ( std::string ( log ) ); }
+    
     Log& operator<< ( const long &log ) { return *this << ( long long ) log; }
     Log& operator<< ( const int &log ) { return *this << ( long long ) log; }
     Log& operator<< ( const short &log ) { return *this << ( long long ) log; }
@@ -43,11 +45,6 @@ public:
     const static enum OutputLevel DEFAULT_LOG_LEVEL;
     const static std::string DEFAULT_LOG_FILE;
     
-    static OutputLevel OutputLevel ()
-    {
-        return mLevel;
-    }
-    
 private:
     Log ();
     Log ( const enum OutputLevel level, const std::string logfile );
@@ -57,12 +54,15 @@ private:
     
     static Log* mInstance;
     
-    static std::ofstream *mLogFile;
+    std::ostream *mOutput;
+    std::ofstream *mLogFile;
     
-    static std::string mLogFilename;
-    static bool mFileOutputEnabled;
-    static enum OutputLevel mLevel;
-    static enum OutputLevel mRequestedLevel;
+    std::string mLogFilename;
+    bool mFileOutputEnabled;
+    enum OutputLevel mLevel;
+    enum OutputLevel mRequestedLevel;
+    
+    bool mTreatWarningsAsErrors;
     
 };
 

@@ -1,9 +1,12 @@
 #include "log.h"
 
 #include <iostream>
+#include <time.h>
 
 const std::string Log::DEFAULT_LOG_FILE =  "acsrelay.log.txt";
-const enum Log::OutputLevel DEFAULT_LOG_LEVEL = Log::OutputLevel::NORMAL;
+const enum Log::OutputLevel Log::DEFAULT_LOG_LEVEL = Log::OutputLevel::NORMAL;
+
+Log* Log::mInstance = nullptr;
 
 Log::Log ()
 {
@@ -17,7 +20,18 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
     mLogFilename = logfile;
     mFileOutputEnabled = true;
     
-    mLogFile = new std::ofstream ( mLogFilename, std::ios::app );
+    mLogFile = new std::ofstream ( mLogFilename, std::ofstream::app | std::ofstream::out );
+    mOutput = &std::cout;
+    
+    mTreatWarningsAsErrors = false;
+    
+    if ( !mLogFile -> good() || !mLogFile -> is_open() )
+    {
+        mLogFile -> close();
+        mLogFile = nullptr;
+        mFileOutputEnabled = false;
+        *mOutput << "E/ Couldn't open log file!";
+    }
 }
 
 Log::~Log ()
@@ -45,36 +59,135 @@ void Log::Stop ()
 
 Log& Log::d ()
 {
-    mRequestedLevel = OutputLevel::DEBUG;
-    *mInstance << "\n";
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    mInstance -> mRequestedLevel = OutputLevel::DEBUG;
+    mInstance -> mOutput = &std::cout;
+    
+    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    {
+        *( mInstance -> mOutput ) << "\nD/ ";
+        
+        if ( mInstance -> mFileOutputEnabled )
+        {
+            *( mInstance -> mLogFile ) << "\n(" << buffer << ") D/ ";
+        }
+    }
+    
     return *mInstance;
 }
 
 Log& Log::e ()
 {
-    mRequestedLevel = OutputLevel::ERROR;
-    *mInstance << "\n";
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    mInstance -> mRequestedLevel = OutputLevel::ERROR;
+    mInstance -> mOutput = &std::cerr;
+    
+    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    {
+        *( mInstance -> mOutput ) << "\nE/ ";
+        
+        if ( mInstance -> mFileOutputEnabled )
+        {
+            *( mInstance -> mLogFile ) << "\n(" << buffer << ") E/ ";
+        }
+    }
+    
     return *mInstance;
 }
 
 Log& Log::i ()
 {
-    mRequestedLevel = OutputLevel::NORMAL;
-    *mInstance << "\n";
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    mInstance -> mRequestedLevel = OutputLevel::NORMAL;
+    mInstance -> mOutput = &std::cout;
+
+    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    {
+        *( mInstance -> mOutput ) << "\nI/ ";
+        
+        if ( mInstance -> mFileOutputEnabled )
+        {
+            *( mInstance -> mLogFile ) << "\n(" << buffer << ") I/ ";
+        }
+    }
+    
     return *mInstance;
 }
 
 Log& Log::v ()
 {
-    mRequestedLevel = OutputLevel::VERBOSE;
-    *mInstance << "\n";
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    mInstance -> mRequestedLevel = OutputLevel::VERBOSE;
+    mInstance -> mOutput = &std::cout;
+    
+    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    {
+        *( mInstance -> mOutput ) << "\nV/ ";
+        
+        if ( mInstance -> mFileOutputEnabled )
+        {
+            *( mInstance -> mLogFile ) << "\n(" << buffer << ") V/ ";
+        }
+    }
+    
     return *mInstance;
 }
 
 Log& Log::w ()
 {
-    mRequestedLevel = OutputLevel::WARNING;
-    *mInstance << "\n";
+    time_t timer;
+    char buffer[26];
+    struct tm* tm_info;
+    time(&timer);
+    tm_info = localtime(&timer);
+    
+    strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    
+    mInstance -> mRequestedLevel = OutputLevel::WARNING;
+    
+    if ( mInstance -> mTreatWarningsAsErrors )
+        mInstance -> mOutput = &std::cerr;
+    else
+        mInstance -> mOutput = &std::cout;
+    
+    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    {
+        *( mInstance -> mOutput ) << "\nW/ ";
+        
+        if ( mInstance -> mFileOutputEnabled )
+        {
+            *( mInstance -> mLogFile ) << "\n(" << buffer << ") W/ ";
+        }
+    }
+    
     return *mInstance;
 }
 
@@ -165,5 +278,5 @@ Log& Log::operator<< ( const bool &log )
 
 void Log::OutputLevel ( const enum OutputLevel level )
 {
-    mLevel = level;
+    mInstance -> mLevel = level;
 }
