@@ -80,7 +80,7 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
 
     mLocalPort = static_cast<unsigned int> ( ir -> GetInteger ( "SERVER", "LOCAL_PORT", 9999 ) );
     mRemotePort = static_cast<unsigned int> ( ir -> GetInteger( "SERVER", "REMOTE_PORT", 9998 ) );
-    mServerType = ir -> GetString ( "SERVER", "TYPE", "AC" ) == "AC" ? AC : RELAY;
+    mServerType = ir -> GetString ( "SERVER", "TYPE", "AC" ) == "RELAY" ? RELAY : AC;
     mHost = ir -> GetString ( "SERVER", "IP", "127.0.0.1" );
     
     sections = ir -> Sections ();
