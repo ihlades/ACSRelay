@@ -3,6 +3,7 @@
 #include <iostream>
 #include <getopt.h>
 #include <stdlib.h>
+#include <string.h>
 
 CMDParams::CMDParams ( int argc, char **argv )
 {

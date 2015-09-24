@@ -1,9 +1,9 @@
 #include <string>
 
-#include <INIReader.h>
-#include <peerconnection.h>
-#include <ACSProtocol.h>
-#include <Socket.h>
+#include "INIReader.h"
+#include "peerconnection.h"
+#include "ACSProtocol.h"
+#include "socket.h"
 #include "tcpsocket.h"
 
 #ifdef DEBUG

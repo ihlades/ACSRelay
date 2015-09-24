@@ -2,7 +2,7 @@
 #define __LOG_H
 
 #include <fstream>
-#include <string>
+#include <string.h>
 
 class LogPacket
 {
@@ -64,7 +64,7 @@ private:
     Log ( const enum OutputLevel level, const std::string logfile );
     ~Log ();
     
-    static void OutputLevel ( const enum OutputLevel level );
+    static void setOutputLevel ( const enum OutputLevel level );
     
     static Log* mInstance;
     

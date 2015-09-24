@@ -5,7 +5,7 @@
 #include <time.h>
 
 const std::string Log::DEFAULT_LOG_FILE =  "acsrelay.log.txt";
-const enum Log::OutputLevel Log::DEFAULT_LOG_LEVEL = Log::OutputLevel::NORMAL;
+const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = Log::OutputLevel::NORMAL;
 
 Log* Log::mInstance = nullptr;
 
@@ -277,7 +277,7 @@ Log& Log::operator<< ( const bool &log )
     return *this;
 }
 
-void Log::OutputLevel ( const enum OutputLevel level )
+void Log::setOutputLevel ( const enum OutputLevel level )
 {
     mInstance -> mLevel = level;
 }
