@@ -10,6 +10,7 @@
 		78077F5D1BA94B6400B36062 /* udpsocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78077F5C1BA94B6400B36062 /* udpsocket.cpp */; };
 		78077F601BA94F6400B36062 /* tcpsocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78077F5F1BA94F6400B36062 /* tcpsocket.cpp */; };
 		784F012D1BADB67100C591FA /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 784F012C1BADB67100C591FA /* log.cpp */; };
+		7860CA071BB4524E004D8C9A /* COPYING in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7860CA061BB451E6004D8C9A /* COPYING */; };
 		78711E141B7BC5F6002A7C7B /* settings.ini in CopyFiles */ = {isa = PBXBuildFile; fileRef = 78711E131B7BC5BA002A7C7B /* settings.ini */; };
 		7887CC971B790CE90092C4C1 /* inet_help.c in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC951B790CE90092C4C1 /* inet_help.c */; };
 		7887CCA21B790CF80092C4C1 /* acsrelay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC991B790CF80092C4C1 /* acsrelay.cpp */; };
@@ -27,6 +28,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
+				7860CA071BB4524E004D8C9A /* COPYING in CopyFiles */,
 				78B2B9CE1B982F5B009F04CF /* README.TXT in CopyFiles */,
 				78711E141B7BC5F6002A7C7B /* settings.ini in CopyFiles */,
 			);
