@@ -28,20 +28,19 @@ PeerConnection::PeerConnection ( const std::string name, Socket* socket )
     }
 }
 
-void PeerConnection::CarUpdateArrived ( const short cid )
+void PeerConnection::CarUpdateArrived ( const short cid, Time time )
 {
-    mLastUpdate[ cid ] = Clock::now ();
+    mLastUpdate[ cid ] = time;
 }
 
-bool PeerConnection::IsWaitingCarUpdate ( const short cid )
+bool PeerConnection::IsWaitingCarUpdate ( const short cid, Time time )
 {
     if ( mCarUpdateInterval == 0 )
         return false;
     
-    Time t = Clock::now ();
     Ms time_since_update;
     
-    time_since_update = std::chrono::duration_cast< Ms > ( t - mLastUpdate[ cid ] );
+    time_since_update = std::chrono::duration_cast< Ms > ( time - mLastUpdate[ cid ] );
     
     return ( time_since_update.count () >= mCarUpdateInterval );
 }

@@ -6,6 +6,10 @@
 
 #include <socket.h>
 
+typedef std::chrono::high_resolution_clock Clock;
+typedef std::chrono::time_point<Clock> Time;
+typedef std::chrono::milliseconds Ms;
+
 /**
  * @brief Class that handles the communication logic with an UDP
  *        plugin. It keeps track of what messages the plugin is
@@ -13,10 +17,6 @@
  *        with the UDP plugin.
  */
 class PeerConnection {
-    
-    typedef std::chrono::high_resolution_clock Clock;
-    typedef std::chrono::time_point<Clock> Time;
-    typedef std::chrono::milliseconds Ms;
     
 public:
     
@@ -108,12 +108,12 @@ public:
      * @param cid Car ID as represented in Assetto Corsa.
      * @return Boolean telling if the plugin expects a new update.
      */
-    bool IsWaitingCarUpdate ( const short cid );
+    bool IsWaitingCarUpdate ( const short cid, Time time );
     /**
      * @brief Notifies the arrival of an ACSP_CAR_UPDATE packet.
      * @param cid Car ID as represented in Assetto Corsa.
      */
-    void CarUpdateArrived ( const short cid );
+    void CarUpdateArrived ( const short cid, Time time );
 private:
     // VARS
     
