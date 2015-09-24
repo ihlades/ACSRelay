@@ -41,6 +41,7 @@
 		78077F5F1BA94F6400B36062 /* tcpsocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcpsocket.cpp; sourceTree = "<group>"; };
 		784F012B1BADB20900C591FA /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
 		784F012C1BADB67100C591FA /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
+		7860CA061BB451E6004D8C9A /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		78711E131B7BC5BA002A7C7B /* settings.ini */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = settings.ini; sourceTree = "<group>"; };
 		7887CC8D1B790C5D0092C4C1 /* ACSRelay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ACSRelay; sourceTree = BUILT_PRODUCTS_DIR; };
 		7887CC951B790CE90092C4C1 /* inet_help.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inet_help.c; sourceTree = "<group>"; };
@@ -112,6 +113,7 @@
 				78077F5C1BA94B6400B36062 /* udpsocket.cpp */,
 				78077F5E1BA94F2900B36062 /* tcpsocket.h */,
 				78077F5F1BA94F6400B36062 /* tcpsocket.cpp */,
+				7860CA061BB451E6004D8C9A /* COPYING */,
 			);
 			path = ACSRelay;
 			sourceTree = "<group>";
