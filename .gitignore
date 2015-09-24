@@ -6,3 +6,5 @@ project.xcworkspace/
 xcuserdata/
 UserInterface.xcuserstate
 .DS_Store
+ACSRelay/bin
+ACSRelay/ACSRelay/cmake_config.h
