@@ -5,7 +5,7 @@
 
 long  UDPSocket::Send ( const char* msg, const size_t len ) const
 {
-    return sendto ( mSockFd, msg, len, 0, ( struct sockaddr* ) &mCa, sizeof ( mCa ) );
+    return sendto ( mSockFd, msg, len, 0, reinterpret_cast<const struct sockaddr*>( &mCa ), sizeof ( mCa ) );
 }
 
 long UDPSocket::Read ( char *msg, const size_t len )
@@ -13,7 +13,7 @@ long UDPSocket::Read ( char *msg, const size_t len )
     socklen_t l = sizeof ( mCa );
     long n;
     
-    n = recvfrom( mSockFd, msg, len, 0, (struct sockaddr*) &mCa, &l );
+    n = recvfrom( mSockFd, msg, len, 0, reinterpret_cast<struct sockaddr*>( &mCa ), &l );
     
     if ( n >= 1 )
     {
@@ -38,7 +38,7 @@ UDPSocket::UDPSocket ( const std::string host, const unsigned int local_port, co
     
     mSockFd = socket ( AF_INET, SOCK_DGRAM, 0 );
     
-    if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
+    if ( bind ( mSockFd, reinterpret_cast<const struct sockaddr*>( &sa ), sizeof ( sa ) ) < 0 )
     {
         Log::e() << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort;
     }
@@ -65,7 +65,7 @@ UDPSocket::UDPSocket ( const unsigned int local_port )
     
     mSockFd = socket ( AF_INET, SOCK_DGRAM, 0 );
     
-    if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
+    if ( bind ( mSockFd, reinterpret_cast<const struct sockaddr*>( &sa ), sizeof ( sa ) ) < 0 )
     {
         Log::e() << "Failed to bind UDP socket for host " << mHost << ":" << mLocalPort;
     }

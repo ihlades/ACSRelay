@@ -7,7 +7,7 @@
 class LogPacket
 {
 public:
-    LogPacket ( char* msg, long len ) { mMsg = strndup ( msg, len ); mLen = len; };
+    LogPacket ( char* msg, long len ) { mMsg = strndup ( msg, len ); mLen = len; }
     std::string ToString () const;
 private:
     char *mMsg;
@@ -39,20 +39,20 @@ public:
     static Log& w ();
     
     Log& operator<< ( const std::string &log );
-    Log& operator<< ( const long long &log );
-    Log& operator<< ( const unsigned long long &log );
+    Log& operator<< ( const long &log );
+    Log& operator<< ( const unsigned long &log );
     Log& operator<< ( const double &log );
     Log& operator<< ( const bool &log );
     
     Log& operator<< ( const char *log ) { return *this << ( std::string ( log ) ); }
     
-    Log& operator<< ( const long &log ) { return *this << ( long long ) log; }
-    Log& operator<< ( const int &log ) { return *this << ( long long ) log; }
-    Log& operator<< ( const short &log ) { return *this << ( long long ) log; }
+    //    Log& operator<< ( const long &log ) { return *this << ( long long ) log; }
+    Log& operator<< ( const int &log ) { return *this << static_cast<long>(log); }
+    Log& operator<< ( const short &log ) { return *this << static_cast<long>(log); }
     
-    Log& operator<< ( const unsigned long &log ) { return *this << ( unsigned long long ) log; }
-    Log& operator<< ( const unsigned int &log ) { return *this << ( unsigned long long ) log; }
-    Log& operator<< ( const unsigned short &log ) { return *this << ( unsigned long long ) log; }
+    //    Log& operator<< ( const unsigned long &log ) { return *this << ( unsigned long long ) log; }
+    Log& operator<< ( const unsigned int &log ) { return *this << static_cast<unsigned long>(log); }
+    Log& operator<< ( const unsigned short &log ) { return *this << static_cast<unsigned long>(log); }
     
     Log& operator<< ( const LogPacket& packet ) { *this << packet.ToString(); return *this; }
     
@@ -64,17 +64,18 @@ private:
     Log ( const enum OutputLevel level, const std::string logfile );
     ~Log ();
     
-    static void setOutputLevel ( const enum OutputLevel level );
+    static void SetOutputLevel ( const enum OutputLevel level );
     
     static Log* mInstance;
     
     std::ostream *mOutput;
     std::ofstream *mLogFile;
     
-    std::string mLogFilename;
-    bool mFileOutputEnabled;
     enum OutputLevel mLevel;
     enum OutputLevel mRequestedLevel;
+    
+    std::string mLogFilename;
+    bool mFileOutputEnabled;
     
     bool mTreatWarningsAsErrors;
 };

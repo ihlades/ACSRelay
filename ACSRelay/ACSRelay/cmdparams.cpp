@@ -140,3 +140,7 @@ CMDParams::PluginParams CMDParams::PluginParamsFromString ( const char *s )
     
     return params;
 }
+
+CMDParams::~CMDParams()
+{
+}

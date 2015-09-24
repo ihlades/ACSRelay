@@ -16,9 +16,9 @@ class TCPSocket : public Socket
 public:
     /**
      * @brief The type of TCP socket.
-     * @brief FROM_FD This marks a TCPSocket object constructed
+     * @enum FROM_FD This marks a TCPSocket object constructed
      *                from an existing socket file descriptor.
-     * @brief SERVER This marks a TCPSocket object constructed
+     * @enum SERVER This marks a TCPSocket object constructed
      *               by specifying parameters such as remote host
      *               and remote TCP port.
      */

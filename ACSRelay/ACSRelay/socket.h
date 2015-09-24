@@ -32,7 +32,7 @@ public:
     
     // CTOR/DCTOR
     
-    virtual ~Socket () {};
+    virtual ~Socket () {}
     
     // METHODS
     
@@ -100,10 +100,10 @@ protected:
     // VARS
     
     int mSockFd;
-    std::string mHost;
-    struct sockaddr_in mCa;
     unsigned int mRemotePort;
     unsigned int mLocalPort;
+    std::string mHost;
+    struct sockaddr_in mCa;
 };
 
 #endif // __SOCKET_H

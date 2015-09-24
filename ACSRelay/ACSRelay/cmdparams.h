@@ -15,7 +15,7 @@ public:
     // CTOR
     
     CMDParams ( int argc, char **argv );
-    virtual ~CMDParams () { }
+    virtual ~CMDParams ();
     
     // STRUCTS
     

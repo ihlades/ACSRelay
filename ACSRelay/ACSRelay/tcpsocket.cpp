@@ -20,7 +20,7 @@ int TCPSocket::Accept()
     int retval;
     
     socklen_t len = sizeof ( mCa );
-    retval = accept(mSockFd, (struct sockaddr*) &mCa, &len );
+    retval = accept(mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), &len );
     
     mRemotePort = ntohs ( mCa.sin_port );
     
@@ -47,11 +47,11 @@ int TCPSocket::Connect( unsigned short timeout )
     fcntl ( mSockFd, F_SETFL, O_NONBLOCK );
     
     
-    if ( ( status = connect ( mSockFd, (struct sockaddr*) &mCa, sizeof ( mCa ) ) ) == -1 )
+    if ( ( status = connect ( mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), sizeof ( mCa ) ) ) == -1 )
     {
         if ( errno != EINPROGRESS )
         {
-            return (int) status;
+            return static_cast<int> ( status );
         }
     }
     
@@ -101,7 +101,7 @@ TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
     
     mSockFd = socket ( AF_INET, SOCK_STREAM, 0 );
     
-    if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
+    if ( bind ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), sizeof ( sa ) ) < 0 )
     {
         Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
     }
@@ -119,12 +119,12 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
 {
     struct sockaddr_in sa;
     
-    if ( type == Type::FROM_FD )
+    if ( type == FROM_FD )
     {
         mSockFd = param;
 
         socklen_t addrlen = sizeof ( mCa );
-        if ( getpeername ( mSockFd, ( struct sockaddr* ) &mCa, &addrlen ) < 0 )
+        if ( getpeername ( mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), &addrlen ) < 0 )
         {
             mIsConnected = false;
         }
@@ -137,12 +137,12 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
             
             addrlen = sizeof ( sa );
             
-            getsockname ( mSockFd, (struct sockaddr* ) &sa, &addrlen );
+            getsockname ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), &addrlen );
             
             mLocalPort = ntohs ( sa.sin_port );
         }
     }
-    else if ( type == Type::SERVER )
+    else if ( type == SERVER )
     {
         mIsConnected = false;
         
@@ -156,7 +156,7 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
         
         mSockFd = socket ( AF_INET, SOCK_STREAM, 0 );
         
-        if ( bind ( mSockFd, ( struct sockaddr* )&sa, sizeof ( sa ) ) < 0 )
+        if ( bind ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), sizeof ( sa ) ) < 0 )
         {
             Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
         }

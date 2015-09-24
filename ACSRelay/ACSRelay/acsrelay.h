@@ -29,7 +29,7 @@ public:
      * It creates the ACSRelay object if none exists.
      */
     static ACSRelay* Build ();
-    virtual ~ACSRelay () {}
+    virtual ~ACSRelay ();
     
     // METHODS
     

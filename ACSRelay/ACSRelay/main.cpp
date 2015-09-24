@@ -14,9 +14,9 @@ int main(int argc, char **argv)
     std::string config_filename;
     
 #ifdef _DEBUG
-    Log::Start ( Log::OutputLevel::DEBUG, Log::DEFAULT_LOG_FILE );
+    Log::Start ( Log::DEBUG, Log::DEFAULT_LOG_FILE );
 #else
-    Log::Start ( Log::OutputLevel::NORMAL, Log::DEFAULT_LOG_FILE );
+    Log::Start ( Log::NORMAL, Log::DEFAULT_LOG_FILE );
 #endif
     
     Log::i() << SW_NAME << " version " << SW_VERSION << ".";

@@ -45,3 +45,8 @@ bool PeerConnection::IsWaitingCarUpdate ( const short cid )
     
     return ( time_since_update.count () >= mCarUpdateInterval );
 }
+
+PeerConnection::~PeerConnection()
+{
+    delete mSocket;
+}

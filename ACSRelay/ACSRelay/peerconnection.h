@@ -24,7 +24,8 @@ public:
      * @brief PluginHandler object constructor
      * @param name Name of the plugin. Currently not used.
      * @param host UDP plugin address as a string.
-     * @param port UDP plugin port as a long integer.
+     * @param local_port UDP port on which to listen as a long integer.
+     * @param remote_port UDP plugin port as a long integer.
      */
     PeerConnection ( const std::string name, const std::string host, const unsigned int local_port, const unsigned int remote_port );
     /**
@@ -38,10 +39,7 @@ public:
      * @brief Implicit PluginHandler object constructor
      */
     PeerConnection () { mSocket = NULL; mCarUpdateInterval = 0; }
-    virtual ~PeerConnection()
-    {
-        delete mSocket;
-    }
+    virtual ~PeerConnection();
     
     /**
      * @brief Getter for the PluginHandler's identifier (name).
@@ -69,7 +67,7 @@ public:
      * @brief Sets the plugin's desired interval between realtime car updates from the server.
      * @param ri Unsigned long representing the interval in milliseconds.
      */
-    void SetCarUpdateInterval ( const unsigned long ri ) { mCarUpdateInterval = ri; }
+    void SetCarUpdateInterval ( const long ri ) { mCarUpdateInterval = ri; }
     
     /**
      * @brief Checks if the plugin is waiting for an ACSP_CAR_INFO packet.
@@ -96,12 +94,12 @@ public:
     bool IsWaitingSessionInfo ( const short sid ) const { return mRequestedSessionInfo[ sid ]; }
     /**
      * @brief Requests an ACSP_SESSION_INFO packet for the specified car ID.
-     * @param cid Session ID as represented in Assetto Corsa.
+     * @param sid Session ID as represented in Assetto Corsa.
      */
     void RequestSessionInfo ( const short sid ) { mRequestedSessionInfo[ sid ] = true; }
     /**
      * @brief Notifies the arrival of an ACSP_SESSION_INFO packet.
-     * @param cid Session ID as represented in Assetto Corsa.
+     * @param sid Session ID as represented in Assetto Corsa.
      */
     void SessionInfoArrived ( const short sid ) { mRequestedSessionInfo[ sid ] = false; }
     
@@ -122,7 +120,7 @@ private:
     std::string mName;
     
     Socket* mSocket;
-    unsigned long mCarUpdateInterval;
+    long mCarUpdateInterval;
     
     bool mRequestedCarInfo[ 64 ];
     bool mRequestedSessionInfo[ 64 ];
