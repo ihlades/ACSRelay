@@ -42,7 +42,7 @@ class ACSRelay
 {
 public:
     // CTOR
-    
+
     /**
      * @brief Returns pointer to the ACSRelay instance.
      * It creates the ACSRelay object if none exists.

@@ -28,7 +28,8 @@ const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL;
 
 Log* Log::mInstance = NULL;
 
-Log::Log ()
+Log::Log () :
+	mLogFile(NULL)
 {
     Log ( DEFAULT_LOG_LEVEL, DEFAULT_LOG_FILE );
 }
@@ -57,6 +58,7 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
 Log::~Log ()
 {
     mLogFile -> close ();
+	delete mLogFile;
 }
 
 void Log::Start ()

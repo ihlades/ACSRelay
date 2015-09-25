@@ -29,7 +29,6 @@ list(SORT project_SOURCES)
 add_executable(${PROJECT_NAME} ${project_SOURCES})
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 
-set(WARNING_FLAGS "-Wall")
-set(CMAKE_CXX_FLAGS "-std=c++11 -O3 ${WARNING_FLAGS}")
-
-
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -std=c++11 -O0 -g")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -std=c++11 -O3 -g")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3")
