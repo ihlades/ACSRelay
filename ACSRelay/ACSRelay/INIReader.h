@@ -27,8 +27,10 @@
 typedef std::map< std::string, std::map< std::string, std::string > > INIData;
 
 /**
- * @brief Helper class that reads an INI file and provides methods
- *        to retrieve data.
+ * @class INIReader.
+ * @brief Used to read an INI files.
+ *        Helper class that reads INI files and
+ *        provides methods to retrieve data from them.
  */
 class INIReader
 {

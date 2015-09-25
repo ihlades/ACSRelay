@@ -25,7 +25,9 @@
 #define UDP_BUFFER_SIZE 1024
 
 /**
- * @brief Subclass of the Socket virtual class.
+ * @class UDPSocket
+ * @brief Provides communication over an UDP socket.
+ *        Subclass of the Socket virtual class.
  *        UDPSocket provides basic functionality for communication
  *        over a UDP socket.
  */

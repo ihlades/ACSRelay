@@ -36,7 +36,8 @@
 #endif
 
 /**
- * @brief Class that provides basic abstraction over socket communcation.
+ * @brief Provides abstraction over socket communication.
+ *        Class that provides basic abstraction over socket communcation.
  *        It holds information about the other device such as
  *        its address and its remote port, and also the local socket
  *        file descriptor. This class also provides methods to

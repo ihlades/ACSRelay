@@ -30,7 +30,9 @@ typedef std::chrono::time_point<Clock> Time;
 typedef std::chrono::milliseconds Ms;
 
 /**
- * @brief Class that handles the communication logic with an UDP
+ * @class PeerConnection
+ * @brief Handles communication logic with plugins.
+ *        Class that handles the communication logic with an UDP
  *        plugin. It keeps track of what messages the plugin is
  *        waiting for and provides a socket on which to communicate
  *        with the UDP plugin.

@@ -32,7 +32,9 @@
 #define BUFFER_SIZE 512
 
 /**
- * @brief Main class whose instance handles the messages exchange between
+ * @class ACSRelay
+ * @brief Main class for handling ACSP messages.
+ *        Main class whose instance handles the messages exchange between
  *        the Assetto Corsa Server and the various UDP plugins. It establishes
  *        the connection to the server and initiates communication with the
  *        plugins defined in the configuration file. It then relays messages
@@ -45,7 +47,8 @@ public:
 
     /**
      * @brief Returns pointer to the ACSRelay instance.
-     * It creates the ACSRelay object if none exists.
+     * If no ACSRelay object exists, it constructs one and
+     * returns a pointer to it.
      */
     static ACSRelay* Build ();
     virtual ~ACSRelay ();
@@ -57,8 +60,27 @@ public:
      * @param ini_fn Name of file containing configuration options in INI format.
      */
     void ReadConfiguration ( std::string ini_fn );
+    /**
+     * @brief Set the remote server port.
+     *        This will be either the UDP port on which the AC game server
+     *        will listen on, or the TCP port on which another ACSRelay software
+     *        will listen on.
+     * @param port Port number as an unsigned integer.
+     */
     void SetRemotePort ( const unsigned int port ) { mRemotePort = port; }
+    /**
+     * @brief Set the local server port.
+     *        This will be the UDP port on which ACSRelay will listen for
+     *        packets from the AC server.
+     * @param port Port number as an unsigned integer.
+     */
     void SetLocalPort ( const unsigned int port ) { mLocalPort = port; }
+    /**
+     * @brief Set the local relay port.
+     *        This will be the TCP port on which ACSRelay will listen for
+     *        packets from another ACSRelay instance.
+     * @param port Port number as an unsigned integer.
+     */
     void SetRelayPort ( const unsigned int port ) { mRelayPort = port; }
     /**
      * @brief Adds a plugin in the specified list.

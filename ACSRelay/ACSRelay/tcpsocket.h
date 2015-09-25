@@ -25,7 +25,9 @@
 #define TCP_BUFFER_SIZE 1024
 
 /**
- * @brief Subclass of the Socket virtual class.
+ * @class TCPSocket
+ * @brief Provides communication over a TCP socket.
+ *        Subclass of the Socket virtual class.
  *        TCPSocket provides basic functionality for communication
  *        over a TCP socket.
  */
@@ -35,15 +37,13 @@ class TCPSocket : public Socket
 public:
     /**
      * @brief The type of TCP socket.
-     * @enum FROM_FD This marks a TCPSocket object constructed
-     *                from an existing socket file descriptor.
-     * @enum SERVER This marks a TCPSocket object constructed
-     *               by specifying parameters such as remote host
-     *               and remote TCP port.
      */
     enum Type {
-        FROM_FD,
-        SERVER
+        FROM_FD, /*!< This marks a TCPSocket object constructed
+                      from an existing socket file descriptor. */
+        SERVER   /*!< This marks a TCPSocket object constructed
+                      by specifying parameters such as remote host
+                      and remote TCP port. */
     };
     
     // CTOR
@@ -101,7 +101,7 @@ private:
     
     /**
      */
-    bool mIsConnected;
+    int8_t mIsConnected;
 };
 
 #endif
