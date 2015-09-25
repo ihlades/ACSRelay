@@ -33,7 +33,7 @@ typedef std::map< std::string, std::map< std::string, std::string > > INIData;
 class INIReader
 {
 public:
-	INIReader ();
+    INIReader ();
     INIReader ( const std::string file );
     
     /**
