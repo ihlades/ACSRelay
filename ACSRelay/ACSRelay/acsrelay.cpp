@@ -97,7 +97,7 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
             // ADD NEW PLUGIN
 
             p = new PeerConnection (
-                sections[ i ],
+                ir -> GetString ( sections[ i ], "NAME", sections[ i ] ),
                 ir -> GetString ( sections[ i ], "IP", "127.0.0.1" ),
                 static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "LOCAL_PORT", 0 ) ),
                 static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "REMOTE_PORT", 0 ) )
