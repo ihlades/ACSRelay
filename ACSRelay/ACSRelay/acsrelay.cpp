@@ -39,34 +39,39 @@ ACSRelay* ACSRelay::Build ()
     {
         mInstance = new ACSRelay ();
     }
-    
+
     return mInstance;
 }
 
 ACSRelay::ACSRelay ()
+	: mLocalPort(-1),
+	  mRemotePort(-1),
+	  mRelayPort(-1),
+	  mMaxFd(0),
+	  mServerSocket(NULL),
+	  mRelaySocket(NULL),
+      mMri(ULONG_MAX)
 {
-    mMaxFd = 0;
-    mLocalPort = mRemotePort = -1;
-    mMri = ULONG_MAX;
+
 }
 
 void ACSRelay::AddPeer ( PeerConnection *plugin)
 {
     std::string host;
-    
+
     host = plugin -> GetSocket() -> Host();
-    
+
     if ( host == "")
     {
         // INCORRECT HOST AND/OR PORT FOR PLUGIN
         return;
     }
-    
+
     Log::v() << "Adding plugin " << plugin -> Name() <<  " (" << host << ":" << plugin -> GetSocket () -> RemotePort () << "). " << "Listening on local UDP port " << plugin -> GetSocket() -> LocalPort() << ".";
 
     if ( plugin -> GetSocket () -> Fd () > mMaxFd )
         mMaxFd = plugin -> GetSocket () -> Fd ();
-    
+
     mPeers[ plugin -> GetSocket() -> Fd () ] = plugin;
 }
 
@@ -74,7 +79,7 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
 {
     PeerConnection *p;
     std::vector< std::string > sections;
-    
+
     INIReader *ir = new INIReader ();
     ir -> parse ( ini_fn );
 
@@ -82,26 +87,26 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
     mRemotePort = static_cast<unsigned int> ( ir -> GetInteger( "SERVER", "REMOTE_PORT", 9998 ) );
     mServerType = ir -> GetString ( "SERVER", "TYPE", "AC" ) == "RELAY" ? RELAY : AC;
     mHost = ir -> GetString ( "SERVER", "IP", "127.0.0.1" );
-    
+
     sections = ir -> Sections ();
-    
+
     for ( unsigned int i = 0; i < sections.size (); i += 1 )
     {
         if ( sections[ i ].substr ( 0, 7 ) == "PLUGIN_" )
         {
             // ADD NEW PLUGIN
-            
+
             p = new PeerConnection (
                 sections[ i ],
                 ir -> GetString ( sections[ i ], "IP", "127.0.0.1" ),
                 static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "LOCAL_PORT", 0 ) ),
                 static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "REMOTE_PORT", 0 ) )
             );
-            
+
             AddPeer ( p );
         }
     }
-    
+
     mRelayPort = static_cast<unsigned int> ( ir -> GetInteger ( "RELAY", "LOCAL_PORT", 0 ) );
 
     delete ir;
@@ -112,15 +117,15 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
     long n;
     char msg[ BUFFER_SIZE ];
     uint8_t ri;
-    
+
     n = plugin -> GetSocket() -> Read ( msg, BUFFER_SIZE );
-    
+
     Log::d() << "Caught message from " << plugin -> Name () << "!\n" << LogPacket ( msg, n );
 
     if ( n < 1 )
         // ERROR
         return;
-        
+
     // Only send ACSP_REALTIMEPOS_INTERVAL to server if it's lower
     // than before.
     if ( static_cast<int8_t> ( msg[ 0 ] ) == ACSProtocol::ACSP_REALTIMEPOS_INTERVAL )
@@ -129,7 +134,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         {
             ri = msg[ 1 ] << 8 | msg[ 2 ];
             plugin -> SetCarUpdateInterval ( ri );
-            
+
             if ( ri < mMri )
             {
                 mMri = ri;
@@ -164,13 +169,13 @@ void ACSRelay::RelayFromServer()
 {
     long n;
     char msg[ BUFFER_SIZE ];
-    
+
     n = mServerSocket -> Read ( msg, BUFFER_SIZE );
-    
+
     if ( n < 1 )
         // ERROR
         return;
-    
+
     Log::d() << "Caught message from  server!\n" << LogPacket ( msg, n );
 
     // Send realtime position update to subscribed plugins
@@ -185,7 +190,7 @@ void ACSRelay::RelayFromServer()
             // Also, if the plugin has the minimum car update interval make
             // sure to send it the packet.
             Time t = Clock::now ();
-            
+
             if ( p -> second -> CarUpdateInterval () == mMri ||
                  p -> second -> IsWaitingCarUpdate ( static_cast<int8_t> ( msg[ 1 ] ), t ) )
             {
@@ -235,7 +240,7 @@ void ACSRelay::RelayFromServer()
 __attribute__((__noreturn__)) void ACSRelay::Start()
 {
     fd_set fds;
-    
+
     PeerConnection* plugin;
     TCPSocket* tcp_socket;
 
@@ -244,7 +249,7 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
         Log::e () << "Trying to start non-configured relay. Aborting...";
         exit ( 2 );
     }
-    
+
     switch ( mServerType )
     {
         case AC:
@@ -254,7 +259,7 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
         case RELAY:
             tcp_socket = new TCPSocket ( mHost, mRemotePort );
             Log::v() << "Relay starting. Trying to connect with another relay (" << mHost << ":" << mRemotePort << ") via TCP" << "...";
-            
+
             if ( tcp_socket -> Connect ( mTCPTimeout ) >= 0 )
             {
                 Log::v() << " Connected!";
@@ -265,10 +270,10 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
                 exit ( 1 );
             }
             mServerSocket = reinterpret_cast<Socket*> ( tcp_socket );
-            
+
             break;
     }
-    
+
     if ( mRelayPort != 0 )
     {
         mRelaySocket = new TCPSocket ( TCPSocket::SERVER, mRelayPort );
@@ -278,41 +283,41 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
 
     if ( mServerSocket -> Fd () > mMaxFd )
         mMaxFd = mServerSocket -> Fd ();
-    
+
     if ( mRelaySocket != NULL )
         mMaxFd = ( mMaxFd < mRelaySocket -> Fd () ) ? mRelaySocket -> Fd () : mMaxFd;
-    
+
     // Initially disable realtime car updates for all plugins.
     for ( auto p = mPeers.begin(); p != mPeers.end (); ++p )
     {
         p -> second -> SetCarUpdateInterval ( 0 );
     }
-    
+
     Log::i() << "Relay started.";
-    
+
     while ( 1 )
     {
         FD_ZERO ( &fds );
-    
+
         for ( auto p = mPeers.begin(); p != mPeers.end (); ++p )
         {
             FD_SET ( p -> second -> GetSocket () -> Fd (), &fds );
-            
+
             // Check if a recently added plugin has a file descriptor
             // bigger than the previous maximum value:
-            
+
             if ( p -> second -> GetSocket() -> Fd () > mMaxFd )
             {
                 mMaxFd = p -> second -> GetSocket() -> Fd ();
             }
         }
-    
+
         FD_SET ( mServerSocket -> Fd (), &fds );
         if ( mRelaySocket != NULL )
             FD_SET ( mRelaySocket -> Fd (), &fds );
-        
+
         select ( mMaxFd + 1, &fds, NULL, NULL, NULL );
-        
+
         for ( int i = 0; i <= mMaxFd; i++ )
         {
             if ( FD_ISSET ( i, &fds ) )
@@ -338,6 +343,7 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
         }
     }
 }
+
 ACSRelay::~ACSRelay()
 {
 }

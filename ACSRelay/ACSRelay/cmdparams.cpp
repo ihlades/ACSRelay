@@ -25,6 +25,10 @@
 #include <string.h>
 
 CMDParams::CMDParams ( int argc, char **argv )
+	: mConfigFilename(""),
+	  mLocalPort(0),
+	  mRemotePort(0),
+	  mRelayPort(0)
 {
     extern char* optarg;
     int c;
@@ -41,9 +45,7 @@ CMDParams::CMDParams ( int argc, char **argv )
         {"config-file", required_argument, 0,  5 },
         {0,         0,                 0,  0 }
     };
-    
-    mConfigFilename = "";
-    mLocalPort = mRemotePort = 0;
+
     mPlugins.clear();
     
     while ( ( c = getopt_long_only ( argc, argv, "c:p:", long_options, &optind ) ) != -1 )
