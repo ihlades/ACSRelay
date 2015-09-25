@@ -24,6 +24,10 @@
 
 #include <iostream>
 
+#ifdef _WIN32
+    #include <winsock2.h>
+#endif
+
 int main(int argc, char **argv)
 {
     ACSRelay *relay = ACSRelay::Build ();
@@ -31,11 +35,16 @@ int main(int argc, char **argv)
     std::list <CMDParams::PluginParams> plugins;
     
     std::string config_filename;
+
+#ifdef _WIN32
+    WSADATA wsadata;
+    WSAStartup ( MAKEWORD ( 2, 2 ), &wsadata );
+#endif
     
 #ifdef _DEBUG
-    Log::Start ( Log::DEBUG, Log::DEFAULT_LOG_FILE );
+    Log::Start ( Log::DEBUG_LVL, Log::DEFAULT_LOG_FILE );
 #else
-    Log::Start ( Log::NORMAL, Log::DEFAULT_LOG_FILE );
+    Log::Start ( Log::NORMAL_LVL, Log::DEFAULT_LOG_FILE );
 #endif
     
     Log::i() << SW_NAME << " version " << SW_VERSION << ".";

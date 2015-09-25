@@ -24,7 +24,7 @@
 #include <time.h>
 
 const std::string Log::DEFAULT_LOG_FILE =  "acsrelay.log.txt";
-const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL;
+const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL_LVL;
 
 Log* Log::mInstance = NULL;
 
@@ -89,7 +89,7 @@ Log& Log::d ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = DEBUG;
+    mInstance -> mRequestedLevel = DEBUG_LVL;
     mInstance -> mOutput = &std::cout;
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
@@ -115,7 +115,7 @@ Log& Log::e ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = ERROR;
+    mInstance -> mRequestedLevel = ERROR_LVL;
     mInstance -> mOutput = &std::cerr;
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
@@ -141,7 +141,7 @@ Log& Log::i ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = NORMAL;
+    mInstance -> mRequestedLevel = NORMAL_LVL;
     mInstance -> mOutput = &std::cout;
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
@@ -167,7 +167,7 @@ Log& Log::v ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = VERBOSE;
+    mInstance -> mRequestedLevel = VERBOSE_LVL;
     mInstance -> mOutput = &std::cout;
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
@@ -193,7 +193,7 @@ Log& Log::w ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = WARNING;
+    mInstance -> mRequestedLevel = WARNING_LVL;
 
     if ( mInstance -> mTreatWarningsAsErrors )
         mInstance -> mOutput = &std::cerr;
@@ -303,7 +303,12 @@ void Log::SetOutputLevel ( const enum OutputLevel level )
     mInstance -> mLevel = level;
 }
 
-// TODO: Output actual packet data as well!
+LogPacket::LogPacket ( char *msg, long len )
+{
+    mMsg = reinterpret_cast<char*> ( malloc ( sizeof ( char ) * len ) );
+    memcpy ( mMsg, msg, len );
+    mLen = len;
+}
 
 std::string LogPacket::ToString () const
 {

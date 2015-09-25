@@ -96,6 +96,10 @@ private:
      * @brief TCPSocket object constructor.
      */
     TCPSocket () {}
+
+    // METHODS
+
+    void SetBlocking ( const bool blocking );
     
     // VARS
     

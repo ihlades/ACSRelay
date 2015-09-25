@@ -37,7 +37,7 @@ public:
      * @param msg Packet data as a byte array.
      * @param len Packet size (equal to the byte array's size).
      */
-    LogPacket ( char* msg, long len ) { mMsg = strndup ( msg, len ); mLen = len; }
+    LogPacket ( char* msg, long len );
     /**
      * @brief Returns packet data in a readable format.
      * @return A string describing the packet.
@@ -62,11 +62,11 @@ public:
      */
     enum OutputLevel
     {
-        ERROR = 0, ///< Output level corresponding to error messages.
-        WARNING = 1, ///< Output level corresponding to warning messages.
-        VERBOSE = 2, ///< Output level corresponding to more verbose messages.
-        NORMAL = 3, ///< Output level corresponding to usual informative messages.
-        DEBUG = 4 /*!< Output level corresponding to debug messages. If the output
+        ERROR_LVL = 0, ///< Output level corresponding to error messages.
+        WARNING_LVL = 1, ///< Output level corresponding to warning messages.
+        VERBOSE_LVL = 2, ///< Output level corresponding to more verbose messages.
+        NORMAL_LVL = 3, ///< Output level corresponding to usual informative messages.
+        DEBUG_LVL = 4 /*!< Output level corresponding to debug messages. If the output
                        level is set to this, all types of messages will be printed. */
     };
 

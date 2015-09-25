@@ -24,6 +24,11 @@ set(project_SOURCES
 	${SOURCE_DIR}/tcpsocket.cpp
 	${SOURCE_DIR}/udpsocket.cpp
 )
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	list(APPEND project_SOURCES ${SOURCE_DIR}/inet_help.c)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
 list(SORT project_SOURCES)
 
 add_executable(${PROJECT_NAME} ${project_SOURCES})
@@ -32,3 +37,7 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/bin")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -std=c++11 -O0 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -std=c++11 -O3 -g")
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	target_link_libraries (${PROJECT_NAME} wsock32 ws2_32.lib)
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")

@@ -20,6 +20,10 @@
 #include "log.h"
 #include "tcpsocket.h"
 
+#ifdef _WIN32
+    #include <ws2tcpip.h>
+#endif
+
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
@@ -46,14 +50,33 @@ int TCPSocket::Accept()
     return retval;
 }
 
+void TCPSocket::SetBlocking( const bool blocking )
+{
+#ifdef _WIN32
+    unsigned long block;
+    block = blocking ? 1 : 0;
+    ioctlsocket ( mSockFd, FIONBIO, &block );
+#else
+    int opts;
+
+    if ( blocking )
+    {
+        opts = fcntl (mSockFd, F_GETFL );
+        opts = opts & ( ~O_NONBLOCK );
+        fcntl ( mSockFd, F_SETFL, opts );
+    }
+    else
+        fcntl ( mSockFd, F_SETFL, O_NONBLOCK );
+#endif
+}
+
 int TCPSocket::Connect( unsigned short timeout )
 {
     fd_set rd, wr;
     long status;
     struct timeval tv;
-    int err;
+    char err;
     socklen_t len = sizeof ( int );
-    int opts;
     
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
@@ -63,8 +86,7 @@ int TCPSocket::Connect( unsigned short timeout )
     FD_ZERO ( &wr );
     FD_SET ( mSockFd, &wr );
     
-    fcntl ( mSockFd, F_SETFL, O_NONBLOCK );
-    
+    SetBlocking ( false );
     
     if ( ( status = connect ( mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), sizeof ( mCa ) ) ) == -1 )
     {
@@ -91,9 +113,7 @@ int TCPSocket::Connect( unsigned short timeout )
         // TCP connection established.
         // Make the socket blocking again...
         
-        opts = fcntl (mSockFd, F_GETFL );
-        opts = opts & ( ~O_NONBLOCK );
-        fcntl ( mSockFd, F_SETFL, opts );
+        SetBlocking ( true );
         
         // And return from the function.
         

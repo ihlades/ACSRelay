@@ -22,6 +22,10 @@
 
 #include <iostream>
 
+#ifdef _WIN32
+    #include <ws2tcpip.h>
+#endif
+
 long  UDPSocket::Send ( const char* msg, const size_t len ) const
 {
     return sendto ( mSockFd, msg, len, 0, reinterpret_cast<const struct sockaddr*>( &mCa ), sizeof ( mCa ) );
