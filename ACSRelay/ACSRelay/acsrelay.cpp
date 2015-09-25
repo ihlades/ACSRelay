@@ -22,7 +22,7 @@
     #include <ws2tcpip.h>
 #else
     #include <sys/socket.h>
-	#include <sys/select.h>
+    #include <sys/select.h>
 #endif
 
 #include <chrono>
@@ -44,12 +44,12 @@ ACSRelay* ACSRelay::Build ()
 }
 
 ACSRelay::ACSRelay ()
-	: mLocalPort(-1),
-	  mRemotePort(-1),
-	  mRelayPort(-1),
-	  mMaxFd(0),
-	  mServerSocket(NULL),
-	  mRelaySocket(NULL),
+    : mLocalPort(-1),
+      mRemotePort(-1),
+      mRelayPort(-1),
+      mMaxFd(0),
+      mServerSocket(NULL),
+      mRelaySocket(NULL),
       mMri(ULONG_MAX)
 {
 

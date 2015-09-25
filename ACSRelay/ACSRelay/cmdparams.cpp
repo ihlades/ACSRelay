@@ -26,14 +26,14 @@
 
 CMDParams::CMDParams ( int argc, char **argv )
 	: mConfigFilename(""),
-	  mLocalPort(0),
-	  mRemotePort(0),
-	  mRelayPort(0)
+      mLocalPort(0),
+      mRemotePort(0),
+      mRelayPort(0)
 {
     extern char* optarg;
     int c;
     int optind;
-    
+
     static struct option long_options[] = {
         {"local-port",  required_argument, 0,  1 },
         {"lp",          required_argument, 0,  1 },
@@ -47,7 +47,7 @@ CMDParams::CMDParams ( int argc, char **argv )
     };
 
     mPlugins.clear();
-    
+
     while ( ( c = getopt_long_only ( argc, argv, "c:p:", long_options, &optind ) ) != -1 )
     {
         switch ( c )
@@ -100,7 +100,7 @@ CMDParams::CMDParams ( int argc, char **argv )
                 }
                 break;
             }
-                
+
             case 'c':
                 if ( !optarg )
                 {
@@ -125,14 +125,14 @@ CMDParams::PluginParams CMDParams::PluginParamsFromString ( const char *s )
 {
     PluginParams params;
     char *p, str[256];
-    
+
     params.name = params.address = "";
     params.port = params.listen_port = 0;
-    
+
     strncpy ( str, s, 256 );
-    
+
     p = strtok( str, ":");
-    
+
     while ( p != NULL )
     {
         if ( params.name == "" )
@@ -155,10 +155,10 @@ CMDParams::PluginParams CMDParams::PluginParamsFromString ( const char *s )
         {
             // INCORRECT SYNTAX
         }
-        
+
         p = strtok( p, ":" );
     }
-    
+
     return params;
 }
 
