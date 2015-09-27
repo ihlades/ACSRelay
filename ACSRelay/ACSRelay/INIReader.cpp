@@ -32,30 +32,107 @@ INIReader::INIReader( const std::string file )
 }
 void INIReader::parse(const std::string file)
 {
-    std::string group, line, l, v;
+    std::string group, line, k, v;
     std::ifstream f ( file.c_str () );
+    size_t pos;
     
     while ( std::getline ( f, line ) )
     {
-        if ( line.find ( "#" ) != std::string::npos )
-            line = line.substr ( 0, line.find ( "#" ) );
-            
+
+        // Start looking for comments on each line.
+        if ( ( pos = line.find_first_of ( "#;" ) ) != std::string::npos )
+        {
+            while ( pos > 1 && ( line[ pos - 1 ] == '\\' ) )
+            {
+                if ( pos == line.length() )
+                {
+                    // We've reached the end of the string.
+                    // There is no comment marker, just semicolons
+                    // used in the value.
+                    pos = line.length();
+                    break;
+                }
+                else
+                {
+                    // The semicolon we've found is preceded by a
+                    // slash, so it's part of a string.
+                    // Keep looking for the comment marker.
+                    pos = line.find_first_of ( "#;", pos + 1 );
+                }
+            }
+        }
+
+        line = line.substr ( 0, pos );
+
+        // If it's a comment or an empty line we'll ignore it.
         if ( line.empty () )
             continue;
-    
+
+        // Trim right whitespace. This allows to have spaces before
+        // comments, without affecting the rest of the line.
+
+        line.erase (
+            std::find_if (
+                line.rbegin (), line.rend (), std::not1 (
+                    std::ptr_fun<int, int> ( std::isspace )
+                )
+            ).base (),
+            line.end ()
+        );
+
+        // Check if this line is a group identifier.
+
         if ( ( line[ 0 ] == '[' ) && line[ line.length () - 1 ] == ']' )
         {
             group = line.substr ( 1, line.length () - 2 );
         }
-        else if ( line.find ( "=" ) != std::string::npos )
+        else if ( line.find_first_of ( "=:" ) != std::string::npos )
         {
-            l = line.substr( 0, line.find ( "=" ) );
-            l = l.substr ( l.find_first_not_of ( " \t" ), l.find_last_not_of ( " \t" ) + 1 );
+            k = line.substr( 0, line.find_first_of ( "=:" ) );
+
+            // Trim left whitespace for key:
+            k.erase (
+                k.begin(),
+                std::find_if (
+                    k.begin (), k.end (), std::not1 (
+                        std::ptr_fun<int, int> ( std::isspace )
+                    )
+                )
+            );
+
+            // Trim right whitespace for key:
+            k.erase (
+                std::find_if (
+                    k.rbegin (), k.rend (), std::not1 (
+                        std::ptr_fun<int, int> ( std::isspace )
+                    )
+                ).base (),
+                k.end ()
+            );
             
-            v = line.substr ( line.find ( "=" ) );
-            v = v.substr ( l.find_first_not_of ( " \t" ) + 1, v.find_last_not_of ( " \t" ) + 1 );
+            v = line.substr ( line.find_first_of ( "=:" ) + 1 );
+
+            // Trim left whitespace for value:
+            v.erase (
+                v.begin(),
+                std::find_if (
+                    v.begin (), v.end (), std::not1 (
+                        std::ptr_fun<int, int> ( std::isspace )
+                    )
+                )
+            );
+
+            // Trim right whitespace for value:
+            v.erase (
+                std::find_if (
+                    v.rbegin (), v.rend (), std::not1 (
+                        std::ptr_fun<int, int> ( std::isspace )
+                    )
+                ).base (),
+                v.end ()
+            );
             
-            mData[group][l] = v;
+            mData[group][k] = v;
         }
     }
     
