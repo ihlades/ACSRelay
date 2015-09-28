@@ -108,7 +108,7 @@ int TCPSocket::Connect( unsigned short timeout )
         return -2;
     }
     
-    if ( errno == 0 )
+    if ( err == 0 )
     {
         // TCP connection established.
         // Make the socket blocking again...
