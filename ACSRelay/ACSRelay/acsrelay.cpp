@@ -204,8 +204,25 @@ void ACSRelay::RelayFromServer()
     n = mServerSocket -> Read ( msg, BUFFER_SIZE );
 
     if ( n < 1 )
-        // ERROR
-        return;
+    {
+        // We can get here either by encountering an error when reading from the socket
+        // or if we're using a RELAY server.
+
+        if ( mServerType == RELAY )
+        {
+            // Be that true, it means it has closed the TCP socket, so we
+            // have to do the same, which means this ACSRelay instance has no
+            // purpose.
+            Log::e() << "Read error. Has the upstream ACSRelay closed?";
+            exit ( 0 );
+        }
+        else
+        {
+            // If upstream resides a classic AC game server, it means we've had
+            // an error while reading from the socket. We should just ignore it.
+            return;
+        }
+    }
 
     Log::d() << "Caught message from  server!\n" << LogPacket ( msg, n );
 
