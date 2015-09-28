@@ -120,11 +120,24 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
 
     n = plugin -> GetSocket() -> Read ( msg, BUFFER_SIZE );
 
+    if ( n < 1 )
+    {
+        // We'll get here only if the peer's TCP socket has been disconnected.
+        // Destroy the PeerConnection to make sure we close the socket on our side.
+        for ( auto p = mPeers.begin (); p != mPeers.end (); ++p )
+        {
+            if ( p -> second == plugin )
+            {
+                delete p -> second;
+                mPeers.erase( p -> first );
+                break;
+            }
+        }
+        return;
+    }
+
     Log::d() << "Caught message from " << plugin -> Name () << "!\n" << LogPacket ( msg, n );
 
-    if ( n < 1 )
-        // ERROR
-        return;
 
     // Only send ACSP_REALTIMEPOS_INTERVAL to server if it's lower
     // than before.

@@ -61,7 +61,7 @@ public:
      * @param remote_port Port on which to send as a long integer.
      */
     TCPSocket ( const std::string host, const unsigned int remote_port );
-    virtual ~TCPSocket() {}
+    virtual ~TCPSocket();
     /**
      * @brief Send bytes through the socket.
      * @param msg Array containing bytes.
@@ -87,6 +87,10 @@ public:
      * @return Negative value on error, 0 on successful connection.
      */
     int Connect ( unsigned short timeout );
+    /**
+     * @brief Closes the TCP socket.
+     */
+    void Close ();
     
 private:
     

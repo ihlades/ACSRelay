@@ -123,6 +123,21 @@ int TCPSocket::Connect( unsigned short timeout )
     return -1;
 }
 
+void TCPSocket::Close ()
+{
+    char msg[ 32 ];
+
+#ifdef _WIN32
+    shutdown ( mSockFd, SD_BOTH );
+#else
+    shutdown ( mSockFd, SHUT_RDWR );
+#endif
+
+    while ( recv ( mSockFd, msg, 32, 0 ) > 0 );
+
+    close ( mSockFd );
+}
+
 TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
 {
     struct sockaddr_in sa;
@@ -208,4 +223,9 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
         memset ( &mCa, 0, sizeof ( mCa ) );
         mCa.sin_addr.s_addr = INADDR_NONE;
     }
+}
+
+TCPSocket::~TCPSocket()
+{
+    Close ();
 }
