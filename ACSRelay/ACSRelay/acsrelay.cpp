@@ -83,8 +83,8 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
     INIReader *ir = new INIReader ();
     ir -> parse ( ini_fn );
 
-    mLocalPort = static_cast<unsigned int> ( ir -> GetInteger ( "SERVER", "LOCAL_PORT", 9999 ) );
-    mRemotePort = static_cast<unsigned int> ( ir -> GetInteger( "SERVER", "REMOTE_PORT", 9998 ) );
+    mLocalPort = static_cast<unsigned int> ( ir -> GetInteger ( "SERVER", "RELAY_PORT", 0 ) );
+    mRemotePort = static_cast<unsigned int> ( ir -> GetInteger( "SERVER", "SERVER_PORT", 0 ) );
     mServerType = ir -> GetString ( "SERVER", "TYPE", "AC" ) == "RELAY" ? RELAY : AC;
     mHost = ir -> GetString ( "SERVER", "IP", "127.0.0.1" );
 
@@ -99,15 +99,15 @@ void ACSRelay::ReadConfiguration( std::string ini_fn )
             p = new PeerConnection (
                 ir -> GetString ( sections[ i ], "NAME", sections[ i ] ),
                 ir -> GetString ( sections[ i ], "IP", "127.0.0.1" ),
-                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "LOCAL_PORT", 0 ) ),
-                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "REMOTE_PORT", 0 ) )
+                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "RELAY_PORT", 0 ) ),
+                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "PLUGIN_PORT", 0 ) )
             );
 
             AddPeer ( p );
         }
     }
 
-    mRelayPort = static_cast<unsigned int> ( ir -> GetInteger ( "RELAY", "LOCAL_PORT", 0 ) );
+    mRelayPort = static_cast<unsigned int> ( ir -> GetInteger ( "RELAY", "LISTEN_PORT", 0 ) );
 
     delete ir;
 }
