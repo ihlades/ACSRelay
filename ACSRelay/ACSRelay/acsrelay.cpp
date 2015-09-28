@@ -138,6 +138,24 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
 
     Log::d() << "Caught message from " << plugin -> Name () << "!\n" << LogPacket ( msg, n );
 
+    // Only relay packets that can actually be sent by a plugin.
+    // Everything else must be bogus.
+
+    switch ( static_cast<int8_t> ( msg[ 0 ] ) )
+    {
+        case ACSProtocol::ACSP_REALTIMEPOS_INTERVAL:
+        case ACSProtocol::ACSP_GET_CAR_INFO:
+        case ACSProtocol::ACSP_SEND_CHAT:
+        case ACSProtocol::ACSP_BROADCAST_CHAT:
+        case ACSProtocol::ACSP_GET_SESSION_INFO:
+        case ACSProtocol::ACSP_SET_SESSION_INFO:
+        case ACSProtocol::ACSP_KICK_USER:
+            break;
+        default:
+            Log::v() << "Unkown or incorrect packet. Dropping it!";
+            return;
+    }
+
 
     // Only send ACSP_REALTIMEPOS_INTERVAL to server if it's lower
     // than before.
@@ -190,6 +208,30 @@ void ACSRelay::RelayFromServer()
         return;
 
     Log::d() << "Caught message from  server!\n" << LogPacket ( msg, n );
+
+    // Only relay packets that can actually be sent by the server.
+    // Everything else must be bogus.
+
+    switch ( static_cast<int8_t> ( msg[ 0 ] ) )
+    {
+        case ACSProtocol::ACSP_NEW_SESSION:
+        case ACSProtocol::ACSP_NEW_CONNECTION:
+        case ACSProtocol::ACSP_CONNECTION_CLOSED:
+        case ACSProtocol::ACSP_CAR_UPDATE:
+        case ACSProtocol::ACSP_CAR_INFO:
+        case ACSProtocol::ACSP_END_SESSION:
+        case ACSProtocol::ACSP_LAP_COMPLETED:
+        case ACSProtocol::ACSP_VERSION:
+        case ACSProtocol::ACSP_CHAT:
+        case ACSProtocol::ACSP_CLIENT_LOADED:
+        case ACSProtocol::ACSP_SESSION_INFO:
+        case ACSProtocol::ACSP_ERROR:
+        case ACSProtocol::ACSP_CLIENT_EVENT:
+            break;
+        default:
+            Log::v() << "Unkown or incorrect packet. Dropping it!";
+            return;
+    }
 
     // Send realtime position update to subscribed plugins
     if ( static_cast<int8_t> ( msg[ 0 ] ) == ACSProtocol::ACSP_CAR_UPDATE )
@@ -337,18 +379,26 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
             {
                 if ( i == mServerSocket -> Fd () )
                 {
+                    // Message came from the server. Treat it as such.
                     RelayFromServer ();
                 }
                 else
                 {
+                    // We either received a message from a plugin,
+                    // or a connection request from a downstream
+                    // ACSRelay instance.
+
                     if ( mRelaySocket != NULL && i == mRelaySocket -> Fd () )
                     {
+                        // Allow TCP connection and add it to our downstream peer list.
+
                         tcp_socket = new TCPSocket ( TCPSocket::FROM_FD, mRelaySocket -> Accept() );
                         plugin = new PeerConnection ( "RELAY", reinterpret_cast<Socket*> ( tcp_socket ) );
                         AddPeer ( plugin );
                     }
                     else
                     {
+                        // Message came from a plugin. Treat it as such.
                         RelayFromPlugin ( mPeers[ i ] );
                     }
                 }
