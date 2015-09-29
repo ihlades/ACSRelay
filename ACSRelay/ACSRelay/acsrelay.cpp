@@ -136,7 +136,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         return;
     }
 
-    Log::d() << "Caught message from " << plugin -> Name () << "!\n" << LogPacket ( msg, n );
+    Log::d() << "Caught message from " << plugin -> Name () << "!\n" << Log::Packet ( msg, n );
 
     // Only relay packets that can actually be sent by a plugin.
     // Everything else must be bogus.
@@ -224,7 +224,7 @@ void ACSRelay::RelayFromServer()
         }
     }
 
-    Log::d() << "Caught message from  server!\n" << LogPacket ( msg, n );
+    Log::d() << "Caught message from  server!\n" << Log::Packet ( msg, n );
 
     // Only relay packets that can actually be sent by the server.
     // Everything else must be bogus.
