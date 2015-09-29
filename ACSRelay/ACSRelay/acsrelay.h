@@ -141,7 +141,7 @@ private:
     
     unsigned long mMri;
     
-    const static unsigned short mTCPTimeout = 5;
+    const static unsigned short kTCPTimeout = 30;
     
 #ifdef DEBUG
     std::ofstream dOut;

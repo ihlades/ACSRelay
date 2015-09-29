@@ -332,7 +332,7 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
             tcp_socket = new TCPSocket ( mHost, mRemotePort );
             Log::v() << "Relay starting. Trying to connect with another relay (" << mHost << ":" << mRemotePort << ") via TCP" << "...";
 
-            if ( tcp_socket -> Connect ( mTCPTimeout ) >= 0 )
+            if ( tcp_socket -> Connect ( kTCPTimeout ) >= 0 )
             {
                 Log::v() << " Connected!";
             }
