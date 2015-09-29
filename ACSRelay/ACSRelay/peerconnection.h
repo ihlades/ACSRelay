@@ -147,6 +147,8 @@ private:
     bool mRequestedSessionInfo[ 64 ];
     
     Time mLastUpdate[ 64 ];
+
+    constexpr static float kUpdateIntervalPrecision = 0.9f;
 };
 
 #endif // __PLUGIN_H

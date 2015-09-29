@@ -61,7 +61,7 @@ bool PeerConnection::IsWaitingCarUpdate ( const short cid, Time time )
     
     time_since_update = std::chrono::duration_cast< Ms > ( time - mLastUpdate[ cid ] );
     
-    return ( time_since_update.count () >= mCarUpdateInterval );
+    return ( time_since_update.count () >= kUpdateIntervalPrecision * mCarUpdateInterval );
 }
 
 PeerConnection::~PeerConnection()
