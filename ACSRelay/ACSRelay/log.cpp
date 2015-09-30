@@ -23,6 +23,7 @@
 #include <iostream>
 #include <sstream>
 #include <time.h>
+#include <wchar.h>
 
 const std::string Log::DEFAULT_LOG_FILE =  "acsrelay.log.txt";
 const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL_LVL;
@@ -331,41 +332,59 @@ std::string Log::_log_packet ( char* msg, long len )
 {
     std::ostringstream r;
 
-    switch ( static_cast<int8_t>(msg[ 0 ]) )
+    switch ( *(reinterpret_cast<int8_t*> ( msg )) )
     {
         case ACSProtocol::ACSP_BROADCAST_CHAT:
         {
             r << "ACSP_BROADCAST_CHAT" ;
-            int namelen = msg[ 1 ] * 4;
-            r << "\n\tMESSAGE: " << std::string ( msg + 2, namelen ) ;
+            int namelen = msg[ 1 ];
+
+            std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 2), namelen );
+            convert32 converter;
+            std::string ws = converter.to_bytes(utf32_string);
+            
+            r << L"\n\tMESSAGE: " << ws;
         }; break;
         case ACSProtocol::ACSP_CAR_INFO:
         {
             r << "ACSP_CAR_INFO";
             int index = 1, len;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tIS CONNECTED: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<uint8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tIS CONNECTED: " << unsigned( *(reinterpret_cast<uint8_t*> ( msg + index )) ); index += 1;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tCAR MODEL: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tCAR MODEL: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tCAR SKIN: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tCAR SKIN: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER NAME: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER NAME: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER TEAM: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER TEAM: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER GUID: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER GUID: " << ws;
+            index += len * 4;
 
         }; break;
         case ACSProtocol::ACSP_CAR_UPDATE:
@@ -373,20 +392,20 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "ACSP_CAR_UPDATE";
             int index = 1;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tPOSITION: (";
 
             if ( sizeof ( float ) == 4 )
             {
-                r << static_cast<float> ( *( msg + index ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<float*> ( msg + index ) ) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 4 ) ) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 8 ) );
             }
             else if ( sizeof ( double ) == 4 )
             {
-                r << static_cast<double> ( *( msg + index ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<double*> ( msg + index ) ) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 4 ) ) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 8 ) );
             }
 
             r << ")";
@@ -396,29 +415,29 @@ std::string Log::_log_packet ( char* msg, long len )
 
             if ( sizeof ( float ) == 4 )
             {
-                r << static_cast<float> ( *( msg + index ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<float*> ( msg + index ) ) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 4 ) ) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 8 ) );
             }
             else if ( sizeof ( double ) == 4 )
             {
-                r << static_cast<double> ( *( msg + index ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<double*> ( msg + index ) ) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 4 ) ) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 8 ) );
             }
 
             r << ")";
             index += 12;
 
-            r << "\n\tGEAR: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tENGINE SPEED: " << static_cast<uint16_t> ( *( msg + index ) ); index += 2;
+            r << "\n\tGEAR: " << unsigned( *(reinterpret_cast<uint8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tENGINE SPEED: " << *(reinterpret_cast<uint16_t*> ( msg + index )); index += 2;
 
             r << "\n\tNORMALIZED SPLINE POSITION: ";
 
             if ( sizeof ( float ) == 4 )
-                r << static_cast<float> ( *( msg + index ) );
+                r << *(reinterpret_cast<float*> ( msg + index ) );
             else if ( sizeof ( double ) == 4 )
-                r << static_cast<double> ( *( msg + index ) );
+                r << *(reinterpret_cast<double*> ( msg + index ) );
 
             index += 4;
 
@@ -427,12 +446,17 @@ std::string Log::_log_packet ( char* msg, long len )
         {
             r << "ACSP_CHAT";
             int index = 1, len;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tMESSAGE: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tMESSAGE: " << ws;
+            index += len * 4;
         }; break;
         case ACSProtocol::ACSP_CLIENT_EVENT:
         {
@@ -445,7 +469,7 @@ std::string Log::_log_packet ( char* msg, long len )
             {
                 case ACSProtocol::ACSP_CE_COLLISION_WITH_CAR:
                 {
-                    r << "\n\tCOLLISION WITH CAR: " << int(static_cast<int8_t> ( *( msg + index ) ));
+                    r << "\n\tCOLLISION WITH CAR: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
                     index += 1;
 
                 } break;
@@ -458,9 +482,9 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tIMPACT SPEED: ";
 
             if ( sizeof ( float ) == 4 )
-                r << static_cast<float> ( *( msg + index ) );
+                r << *(reinterpret_cast<float*> ( msg + index ));
             else if ( sizeof ( double ) == 4 )
-                r << static_cast<double> ( *( msg + index ) );
+                r << *(reinterpret_cast<double*> ( msg + index ));
 
             index += 4;
 
@@ -468,15 +492,15 @@ std::string Log::_log_packet ( char* msg, long len )
 
             if ( sizeof ( float ) == 4 )
             {
-                r << static_cast<float> ( *( msg + index ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<float*> ( msg + index )) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 4 )) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 8 ));
             }
             else if ( sizeof ( double ) == 4 )
             {
-                r << static_cast<double> ( *( msg + index ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<double*> ( msg + index )) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 4 )) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 8 ));
             }
 
             r << ")";
@@ -486,15 +510,15 @@ std::string Log::_log_packet ( char* msg, long len )
 
             if ( sizeof ( float ) == 4 )
             {
-                r << static_cast<float> ( *( msg + index ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<float> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<float*> ( msg + index )) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 4 )) << ", ";
+                r << *(reinterpret_cast<float*> ( msg + index + 8 ));
             }
             else if ( sizeof ( double ) == 4 )
             {
-                r << static_cast<double> ( *( msg + index ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 4 ) ) << ", ";
-                r << static_cast<double> ( *( msg + index + 8 ) );
+                r << *(reinterpret_cast<double*> ( msg + index )) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 4 )) << ", ";
+                r << *(reinterpret_cast<double*> ( msg + index + 8 ));
             }
 
             r << ")";
@@ -504,22 +528,29 @@ std::string Log::_log_packet ( char* msg, long len )
         case ACSProtocol::ACSP_CLIENT_LOADED:
         {
             r << "ACSP_CLIENT_LOADED";
-            r << "\n\tCAR ID: " << unsigned(static_cast<uint8_t> ( msg[ 1 ] ));
+            r << "\n\tCAR ID: " << unsigned( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_CONNECTION_CLOSED:
         {
             r << "ACSP_CONNECTION_CLOSED";
             int len, index = 1;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER NAME: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER NAME: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER GUID: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER GUID: " << ws;
+            index += len * 4;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
             r << "\n\tCAR MODEL: " << std::string ( msg + index, len );
@@ -533,9 +564,15 @@ std::string Log::_log_packet ( char* msg, long len )
         {
             r << "ACSP_END_SESSION";
 
-            int len = msg[ 1 ] * 4;
+            int len = msg[ 1 ];
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            r << "\n\tJSON FILENAME: " << std::string ( msg + 2, len );
+            len = msg[ 2 ];
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + 2), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tJSON FILENAME: " << ws;
 
         }; break;
         case ACSProtocol::ACSP_ERROR:
@@ -547,41 +584,48 @@ std::string Log::_log_packet ( char* msg, long len )
         case ACSProtocol::ACSP_GET_CAR_INFO:
         {
             r << "ACSP_GET_CAR_INFO";
-            r << "\n\tCAR ID: "; r << unsigned(static_cast<uint8_t> ( msg[ 1 ] ));
+            r << "\n\tCAR ID: "; r << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_GET_SESSION_INFO:
         {
             r << "ACSP_GET_SESSION_INFO";
-            r << "\n\tSESSION INDEX: " << unsigned(static_cast<uint8_t> ( msg[ 1 ] ));
+            r << "\n\tSESSION INDEX: " <<  *(reinterpret_cast<int16_t*> ( msg + 1 ));
         }; break;
         case ACSProtocol::ACSP_KICK_USER:
         {
             r << "ACSP_KICK_USER";
-            r << "\n\tCAR ID: " << unsigned(static_cast<uint8_t> ( msg[ 1 ] ));
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_LAP_COMPLETED:
         {
             r << "ACSP_LAP_COMPLETED";
             int index = 1;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tLAPTIME: " << static_cast<uint32_t> ( *( msg + index ) ); index += 1;
-            r << "\n\tCUTS: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tLAPTIME: " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 1;
+            r << "\n\tCUTS: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
         }; break;
         case ACSProtocol::ACSP_NEW_CONNECTION:
         {
             r << "ACSP_NEW_CONNECTION";
             int len, index = 1;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER NAME: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER NAME: " << ws;
+            index += len * 4;
 
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tDRIVER GUID: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tDRIVER GUID: " << ws;
+            index += len * 4;
 
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
             r << "\n\tCAR MODEL: " << std::string ( msg + index, len );
@@ -595,15 +639,20 @@ std::string Log::_log_packet ( char* msg, long len )
         {
             r << "ACSP_NEW_SESSION";
             int len, index = 1;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            r << "\n\tPROTOCOL VERSION: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tSESSION INDEX: "; r << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tCURRENT SESSION INDEX: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tSESSION COUNT: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tSESSION INDEX: "; r << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tCURRENT SESSION INDEX: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tSESSION COUNT: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
-            len = msg[ 5 ] * 4; index += 1;
-            r << "\n\tSERVER NAME: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tSERVER NAME: " << ws;
+            index += len * 4;
 
             len = msg[ index ]; index += 1;
             r << "\n\tTRACK: " << std::string ( msg + index, len );
@@ -617,40 +666,40 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tSESSION NAME: " << std::string ( msg + index, len );
             index += len;
 
-            r << "\n\tTYPE: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tTYPE: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
-            r << "\n\tTIME: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tTIME: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tLAPS: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tLAPS: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tWAIT TIME: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tWAIT TIME: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tAMBIENT TEMP: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tAMBIENT TEMP: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
-            r << "\n\tROAD TEMP: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tROAD TEMP: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
             len = msg[ index ]; index += 1;
             r << "\n\tWEATHER GRAPHICS: " << std::string ( msg + index, len );
             index += len;
 
-            r << "\n\tELAPSED TIME (ms): " << static_cast<uint32_t> ( *( msg + index ) );
+            r << "\n\tELAPSED TIME (ms): " << *(reinterpret_cast<uint32_t*> ( msg + index ) );
             index += 4;
         }; break;
         case ACSProtocol::ACSP_REALTIMEPOS_INTERVAL:
         {
             r << "ACSP_REALTIMEPOS_INTERVAL";
-            r << "\n\tINTERVAL (ms): " << unsigned(static_cast<uint8_t> ( msg[ 1 ] ));
+            r << "\n\tINTERVAL (ms): " << int( *(reinterpret_cast<uint16_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_SEND_CHAT:
         {
             r << "ACSP_SEND_CHAT";
-            r << "\n\tCAR ID: " << int(static_cast<int8_t> ( msg[ 1 ] ));
+            r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
             int namelen = msg[ 2 ] * 4;
             r << "\n\tMESSAGE: " << std::string ( msg + 3, namelen ) ;
         }; break;
@@ -658,16 +707,20 @@ std::string Log::_log_packet ( char* msg, long len )
         {
             r << "ACSP_SESSION_INFO";
             int len, index = 1;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
-            r << "\n\tPROTOCOL VERSION: " << int(static_cast<int8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tSESSION INDEX: " << int(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tCURRENT SESSION INDEX: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tSESSION COUNT: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tSESSION INDEX: "; r << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tCURRENT SESSION INDEX: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tSESSION COUNT: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
-            index = 6;
-            len = msg[ 5 ] * 4; index += 1;
-            r << "\n\tSERVER NAME: " << std::string ( msg + index, len );
-            index += len;
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tSERVER NAME: " << ws;
+            index += len * 4;
 
             len = msg[ index ]; index += 1;
             r << "\n\tTRACK: " << std::string ( msg + index, len );
@@ -681,29 +734,29 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tSESSION NAME: " << std::string ( msg + index, len );
             index += len;
 
-            r << "\n\tTYPE: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tTYPE: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
-            r << "\n\tTIME: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tTIME: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tLAPS: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tLAPS: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tWAIT TIME: " << static_cast<uint16_t> ( *( msg + index ) );
+            r << "\n\tWAIT TIME: " << *(reinterpret_cast<uint16_t*> ( msg + index ) );
             index += 2;
 
-            r << "\n\tAMBIENT TEMP: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tAMBIENT TEMP: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
-            r << "\n\tROAD TEMP: " << unsigned(static_cast<uint8_t> ( *( msg + index ) ));
+            r << "\n\tROAD TEMP: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) );
             index += 1;
 
             len = msg[ index ]; index += 1;
             r << "\n\tWEATHER GRAPHICS: " << std::string ( msg + index, len );
             index += len;
 
-            r << "\n\tELAPSED TIME (ms): " << static_cast<uint32_t> ( *( msg + index ) );
+            r << "\n\tELAPSED TIME (ms): " << *(reinterpret_cast<uint32_t*> ( msg + index ) );
             index += 4;
 
         }; break;
@@ -712,18 +765,18 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "ACSP_SET_SESSION_INFO";
             int len, index = 1;
 
-            r << "\n\tSESSION INDEX: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
+            r << "\n\tSESSION INDEX: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             len = msg[ index ] * 4; index += 1;
             r << "\n\tSESSION NAME: " << std::string ( msg + 3, len ); index += len;
-            r << "\n\tSESSION INDEX: " << unsigned(static_cast<uint8_t> ( *( msg + index ) )); index += 1;
-            r << "\n\tLAPS: " << static_cast<uint32_t> ( *( msg + index ) ); index += 4;
-            r << "\n\tTIME (s): " << static_cast<uint32_t> ( *( msg + index ) ); index += 4;
-            r << "\n\tWAIT TIME (s): " << static_cast<int32_t> ( *( msg + index ) ); index += 4;
+            r << "\n\tSESSION TYPE: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tLAPS: " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
+            r << "\n\tTIME (s): " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
+            r << "\n\tWAIT TIME (s): " << *(reinterpret_cast<int32_t*> ( msg + index ) ); index += 4;
         }; break;
         case ACSProtocol::ACSP_VERSION:
         {
             r << "ACSP_VERSION";
-            r << "\n\tPROTOCOL VERSION: " << int(static_cast<int8_t> ( msg[ 1 ] ));
+            r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
     }
 

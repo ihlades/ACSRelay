@@ -22,6 +22,7 @@
 
 #include <fstream>
 #include <string.h>
+#include <locale>
 
 /**
  * @class Log
@@ -57,6 +58,12 @@ private:
     };
     
 public:
+    template <class internT, class externT, class stateT>
+    struct codecvt : std::codecvt<internT,externT,stateT>
+    { ~codecvt(){} };
+
+    typedef std::wstring_convert<codecvt<char16_t,char,std::mbstate_t>,char16_t> convert16;
+    typedef std::wstring_convert<codecvt<char32_t,char,std::mbstate_t>,char32_t> convert32;
     /**
      * @brief Possible levels of verbosity for the log functions.
      */
