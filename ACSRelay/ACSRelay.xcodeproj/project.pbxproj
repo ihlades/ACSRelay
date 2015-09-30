@@ -94,10 +94,10 @@
 			isa = PBXGroup;
 			children = (
 				7887CC981B790CF80092C4C1 /* ACSProtocol.h */,
+				7887CC9A1B790CF80092C4C1 /* acsrelay.h */,
 				7887CC991B790CF80092C4C1 /* acsrelay.cpp */,
 				784F012B1BADB20900C591FA /* log.h */,
 				784F012C1BADB67100C591FA /* log.cpp */,
-				7887CC9A1B790CF80092C4C1 /* acsrelay.h */,
 				78B2B9CB1B970551009F04CF /* cmdparams.cpp */,
 				78B2B9CA1B9703AB009F04CF /* cmdparams.h */,
 				7887CC951B790CE90092C4C1 /* inet_help.c */,

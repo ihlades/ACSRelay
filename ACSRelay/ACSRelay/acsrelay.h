@@ -25,6 +25,8 @@
 #include "socket.h"
 #include "tcpsocket.h"
 
+#include <queue>
+
 #ifdef DEBUG
     #include <fstream>
 #endif
@@ -138,10 +140,11 @@ private:
     TCPSocket* mRelaySocket;
     
     std::map< int, PeerConnection* > mPeers;
+
+    uint16_t mRequestedInterval;
+    uint16_t mSetInterval;
     
-    unsigned long mMri;
-    
-    const static unsigned short kTCPTimeout = 30;
+    const static unsigned int kTCPTimeout = 30;
     
 #ifdef DEBUG
     std::ofstream dOut;

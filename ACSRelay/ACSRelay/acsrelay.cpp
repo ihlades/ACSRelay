@@ -50,7 +50,8 @@ ACSRelay::ACSRelay ()
       mMaxFd(0),
       mServerSocket(NULL),
       mRelaySocket(NULL),
-      mMri(ULONG_MAX)
+      mRequestedInterval(0),
+      mSetInterval(0)
 {
 
 }
@@ -152,7 +153,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         case ACSProtocol::ACSP_KICK_USER:
             break;
         default:
-            Log::v() << "Unkown or incorrect packet. Dropping it!";
+            Log::v() << "Unknown or incorrect packet. Dropping it!";
             return;
     }
 
@@ -161,16 +162,39 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
     // than before.
     if ( static_cast<int8_t> ( msg[ 0 ] ) == ACSProtocol::ACSP_REALTIMEPOS_INTERVAL )
     {
-        if ( n >= 3 )
+        if ( n >= 2 )
         {
-            ri = msg[ 1 ] << 8 | msg[ 2 ];
+            ri = msg[ 1 ];
             plugin -> SetCarUpdateInterval ( ri );
 
-            if ( ri < mMri )
+            // If mSetInterval is not zero, then we know the server is online
+            // and we can send the packet. Set mRequestedInterval as well, so
+            // that we'll resend this packet if the server doesn't start
+            // giving us updates.
+            if ( mSetInterval != 0 )
             {
-                mMri = ri;
-                Log::d () << "Relaying packet to server.";
-                mServerSocket -> Send ( msg, n );
+                if ( ri < mSetInterval )
+                {
+                    mSetInterval = mRequestedInterval = ri;
+                    Log::d () << "Relaying packet to server.";
+                    mServerSocket -> Send ( msg, n );
+                }
+            }
+            else
+            {
+                // The server hasn't yet responded to our update subscription.
+                // Store the requested interval to send the update request packet
+                // next time the server sends us a message to make sure it is
+                // online.
+                //
+                // Do this in two cases: either this is the first
+                // ACSP_REALTIMEPOS_INTERVAL we've processed, or the requested
+                // interval is shorter than what we previously had.
+                if ( mRequestedInterval == 0 || ri < mRequestedInterval )
+                {
+                    Log::d () << "Set mRequestedInterval to " << ri << " ms.";
+                    mRequestedInterval = ri;
+                }
             }
         }
     }
@@ -246,13 +270,24 @@ void ACSRelay::RelayFromServer()
         case ACSProtocol::ACSP_CLIENT_EVENT:
             break;
         default:
-            Log::v() << "Unkown or incorrect packet. Dropping it!";
+            Log::v() << "Unknown or incorrect packet. Dropping it!";
             return;
     }
 
     // Send realtime position update to subscribed plugins
     if ( static_cast<int8_t> ( msg[ 0 ] ) == ACSProtocol::ACSP_CAR_UPDATE )
     {
+        // We've received an ACSP_CAR_UPDATE packet, so our
+        // ACSP_REALTIMEPOS_INTERVAL got to the server. Take note of that.
+        //
+        // We're assuming that the latest update request we sent to the server
+        // got there.
+        if ( mRequestedInterval != 0 )
+        {
+            mSetInterval = mRequestedInterval;
+            mRequestedInterval = 0;
+        }
+
         for ( auto p = mPeers.begin (); p != mPeers.end (); ++p )
         {
             // Send ACSP_CAR_UPDATE packets to any plugin that is interested.
@@ -263,7 +298,7 @@ void ACSRelay::RelayFromServer()
             // sure to send it the packet.
             Time t = Clock::now ();
 
-            if ( p -> second -> CarUpdateInterval () == mMri ||
+            if ( p -> second -> CarUpdateInterval () == mSetInterval ||
                  p -> second -> IsWaitingCarUpdate ( static_cast<int8_t> ( msg[ 1 ] ), t ) )
             {
                 Log::d () << "Relaying packet to " << p -> second -> Name ();
@@ -306,6 +341,19 @@ void ACSRelay::RelayFromServer()
             Log::d () << "Relaying packet to " << p -> second -> Name ();
             p -> second -> GetSocket () -> Send ( msg, n );
         }
+    }
+
+    // The server sent us a message so it's online. This is the right time
+    // to check if we have to send it a ACSP_REALTIMEPOS_INTERVAL packet.
+    if ( mRequestedInterval != 0 )
+    {
+        msg[0] = ACSProtocol::ACSP_REALTIMEPOS_INTERVAL;
+        *(reinterpret_cast<uint16_t*>( msg + 1 )) = mRequestedInterval;
+
+        // Send the ACSP_REALTIMEPOS_INTERVAL packet to the server:
+        mServerSocket -> Send ( msg, 3 );
+
+        Log::d () << "Sent packet to server:\n" << Log::Packet ( msg, 3 );
     }
 }
 
