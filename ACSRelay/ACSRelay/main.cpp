@@ -61,6 +61,8 @@ int main(int argc, char **argv)
         config_filename = DEFAULT_CFG_FILE;
     }
 
+    Log::v () << "Using configuration file \"" << config_filename << "\"";
+
     relay -> ReadConfiguration ( config_filename );
     
     // Add plugins from command line parameters.

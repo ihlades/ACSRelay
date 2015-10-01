@@ -96,7 +96,7 @@ Log& Log::d ()
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
     {
-        *( mInstance -> mOutput ) << "\nD/ ";
+        *( mInstance -> mOutput ) << "\n(D): ";
 
         if ( mInstance -> mFileOutputEnabled )
         {
@@ -122,7 +122,7 @@ Log& Log::e ()
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
     {
-        *( mInstance -> mOutput ) << "\nE/ ";
+        *( mInstance -> mOutput ) << "\n(E): ";
 
         if ( mInstance -> mFileOutputEnabled )
         {
@@ -148,7 +148,7 @@ Log& Log::i ()
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
     {
-        *( mInstance -> mOutput ) << "\nI/ ";
+        *( mInstance -> mOutput ) << "\n(I): ";
 
         if ( mInstance -> mFileOutputEnabled )
         {
@@ -174,7 +174,7 @@ Log& Log::v ()
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
     {
-        *( mInstance -> mOutput ) << "\nV/ ";
+        *( mInstance -> mOutput ) << "\n(V): ";
 
         if ( mInstance -> mFileOutputEnabled )
         {
@@ -204,7 +204,7 @@ Log& Log::w ()
 
     if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
     {
-        *( mInstance -> mOutput ) << "\nW/ ";
+        *( mInstance -> mOutput ) << "\n(W): ";
 
         if ( mInstance -> mFileOutputEnabled )
         {
@@ -336,18 +336,24 @@ std::string Log::_log_packet ( char* msg, long len )
     {
         case ACSProtocol::ACSP_BROADCAST_CHAT:
         {
-            r << "ACSP_BROADCAST_CHAT" ;
+            r << "\n\t+-------------------+";
+            r << "\n\t ACSP_BROADCAST_CHAT ";
+            r << "\n\t+-------------------+";
+
             int namelen = msg[ 1 ];
 
             std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 2), namelen );
             convert32 converter;
             std::string ws = converter.to_bytes(utf32_string);
             
-            r << L"\n\tMESSAGE: " << ws;
+            r << L"\n\tMESSAGE: \"" << ws << "\"";
         }; break;
         case ACSProtocol::ACSP_CAR_INFO:
         {
-            r << "ACSP_CAR_INFO";
+            r << "\n\t+-------------+";
+            r << "\n\t ACSP_CAR_INFO ";
+            r << "\n\t+-------------+";
+
             int index = 1, len;
             std::u32string utf32_string;
             convert32 converter;
@@ -389,7 +395,10 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_CAR_UPDATE:
         {
-            r << "ACSP_CAR_UPDATE";
+            r << "\n\t+---------------+";
+            r << "\n\t ACSP_CAR_UPDATE ";
+            r << "\n\t+---------------+";
+
             int index = 1;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -444,7 +453,10 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_CHAT:
         {
-            r << "ACSP_CHAT";
+            r << "\n\t+---------+";
+            r << "\n\t ACSP_CHAT ";
+            r << "\n\t+---------+";
+
             int index = 1, len;
             std::u32string utf32_string;
             convert32 converter;
@@ -455,12 +467,15 @@ std::string Log::_log_packet ( char* msg, long len )
             len = msg[ index ]; index += 1;
             utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
             ws = converter.to_bytes(utf32_string);
-            r << "\n\tMESSAGE: " << ws;
+            r << "\n\tMESSAGE: \"" << ws << "\"";
             index += len * 4;
         }; break;
         case ACSProtocol::ACSP_CLIENT_EVENT:
         {
-            r << "ACSP_CLIENT_EVENT";
+            r << "\n\t+-----------------+";
+            r << "\n\t ACSP_CLIENT_EVENT ";
+            r << "\n\t+-----------------+";
+
             uint8_t evtype = msg[ 1 ];
 
             int index = 2;
@@ -527,12 +542,18 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_CLIENT_LOADED:
         {
-            r << "ACSP_CLIENT_LOADED";
+            r << "\n\t+------------------+";
+            r << "\n\t ACSP_CLIENT_LOADED ";
+            r << "\n\t+------------------+";
+
             r << "\n\tCAR ID: " << unsigned( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_CONNECTION_CLOSED:
         {
-            r << "ACSP_CONNECTION_CLOSED";
+            r << "\n\t+----------------------+";
+            r << "\n\t ACSP_CONNECTION_CLOSED ";
+            r << "\n\t+----------------------+";
+
             int len, index = 1;
             std::u32string utf32_string;
             convert32 converter;
@@ -562,7 +583,9 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_END_SESSION:
         {
-            r << "ACSP_END_SESSION";
+            r << "\n\t+----------------+";
+            r << "\n\t ACSP_END_SESSION ";
+            r << "\n\t+----------------+";
 
             int len = msg[ 1 ];
             std::u32string utf32_string;
@@ -577,28 +600,43 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_ERROR:
         {
-            r << "ACSP_ERROR";
+            r << "\n\t+----------+";
+            r << "\n\t ACSP_ERROR ";
+            r << "\n\t+----------+";
+
             int namelen = msg[ 1 ] * 4;
             r << "\n\tERROR: " << std::string ( msg + 2, namelen ) ;
         }; break;
         case ACSProtocol::ACSP_GET_CAR_INFO:
         {
-            r << "ACSP_GET_CAR_INFO";
+            r << "\n\t+-----------------+";
+            r << "\n\t ACSP_GET_CAR_INFO ";
+            r << "\n\t+-----------------+";
+
             r << "\n\tCAR ID: "; r << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_GET_SESSION_INFO:
         {
-            r << "ACSP_GET_SESSION_INFO";
+            r << "\n\t+---------------------+";
+            r << "\n\t ACSP_GET_SESSION_INFO ";
+            r << "\n\t+---------------------+";
+
             r << "\n\tSESSION INDEX: " <<  *(reinterpret_cast<int16_t*> ( msg + 1 ));
         }; break;
         case ACSProtocol::ACSP_KICK_USER:
         {
-            r << "ACSP_KICK_USER";
+            r << "\n\t+--------------+";
+            r << "\n\t ACSP_KICK_USER ";
+            r << "\n\t+--------------+";
+
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
         case ACSProtocol::ACSP_LAP_COMPLETED:
         {
-            r << "ACSP_LAP_COMPLETED";
+            r << "\n\t+------------------+";
+            r << "\n\t ACSP_LAP_COMPLETED ";
+            r << "\n\t+------------------+";
+
             int index = 1;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -607,7 +645,10 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_NEW_CONNECTION:
         {
-            r << "ACSP_NEW_CONNECTION";
+            r << "\n\t+-------------------+";
+            r << "\n\t ACSP_NEW_CONNECTION ";
+            r << "\n\t+-------------------+";
+
             int len, index = 1;
             std::u32string utf32_string;
             convert32 converter;
@@ -637,7 +678,9 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_NEW_SESSION:
         {
-            r << "ACSP_NEW_SESSION";
+            r << "\n\t+----------------+";
+            r << "\n\t ACSP_NEW_SESSION ";
+            r << "\n\t+----------------+";
             int len, index = 1;
             std::u32string utf32_string;
             convert32 converter;
@@ -693,19 +736,42 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_REALTIMEPOS_INTERVAL:
         {
-            r << "ACSP_REALTIMEPOS_INTERVAL";
-            r << "\n\tINTERVAL (ms): " << int( *(reinterpret_cast<uint16_t*> ( msg + 1 )) );
+            r << "\n\t+-------------------------+";
+            r << "\n\t ACSP_REALTIMEPOS_INTERVAL ";
+            r << "\n\t+-------------------------+";
+
+            // In the sample UDP plugin, provided by Kunos, the INTERVAL is a UINT16,
+            // but in practice it's an UINT8. So let's handle both, just in case...
+            if ( len > 2 )
+            {
+                r << "\n\tINTERVAL (ms): " << int( *(reinterpret_cast<uint16_t*> ( msg + 1 )) );
+            }
+            else if ( len == 2 )
+            {
+                r << "\n\tINTERVAL (ms): " << int( *(reinterpret_cast<uint8_t*> ( msg + 1 )) );
+            }
         }; break;
         case ACSProtocol::ACSP_SEND_CHAT:
         {
-            r << "ACSP_SEND_CHAT";
+            r << "\n\t+--------------+";
+            r << "\n\t ACSP_SEND_CHAT ";
+            r << "\n\t+--------------+";
+
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
-            int namelen = msg[ 2 ] * 4;
-            r << "\n\tMESSAGE: " << std::string ( msg + 3, namelen ) ;
+            int namelen = msg[ 2 ];
+
+            std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 3), namelen );
+            convert32 converter;
+            std::string ws = converter.to_bytes(utf32_string);
+
+            r << L"\n\tMESSAGE: \"" << ws << "\"";
         }; break;
         case ACSProtocol::ACSP_SESSION_INFO:
         {
-            r << "ACSP_SESSION_INFO";
+            r << "\n\t+-----------------+";
+            r << "\n\t ACSP_SESSION_INFO ";
+            r << "\n\t+-----------------+";
+
             int len, index = 1;
             std::u32string utf32_string;
             convert32 converter;
@@ -762,12 +828,22 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_SET_SESSION_INFO:
         {
-            r << "ACSP_SET_SESSION_INFO";
+            r << "\n\t+---------------------+";
+            r << "\n\t ACSP_SET_SESSION_INFO ";
+            r << "\n\t+---------------------+";
+
             int len, index = 1;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
 
             r << "\n\tSESSION INDEX: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
-            len = msg[ index ] * 4; index += 1;
-            r << "\n\tSESSION NAME: " << std::string ( msg + 3, len ); index += len;
+
+            len = msg[ index ]; index += 1;
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
+            ws = converter.to_bytes(utf32_string);
+            r << "\n\tSESSION NAME: " << ws; index += len * 4;
+
             r << "\n\tSESSION TYPE: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tLAPS: " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
             r << "\n\tTIME (s): " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
@@ -775,9 +851,16 @@ std::string Log::_log_packet ( char* msg, long len )
         }; break;
         case ACSProtocol::ACSP_VERSION:
         {
-            r << "ACSP_VERSION";
+            r << "\n\t+------------+";
+            r << "\n\t ACSP_VERSION ";
+            r << "\n\t+------------+";
+
             r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
         }; break;
+        default:
+        {
+            r << "\n\tUnknown or corrupt packet";
+        } break;
     }
 
     return r.str ();

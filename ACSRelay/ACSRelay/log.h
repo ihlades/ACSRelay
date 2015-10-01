@@ -66,15 +66,19 @@ public:
     typedef std::wstring_convert<codecvt<char32_t,char,std::mbstate_t>,char32_t> convert32;
     /**
      * @brief Possible levels of verbosity for the log functions.
+     * Lower values have a higher priority. For example, if a message with
+     * a higher priority (lower enum value) than the logger output level is sent
+     * the message will be printed. If it has a lower priority than the current
+     * logger output level, it will be ignored.
      */
     enum OutputLevel
     {
         ERROR_LVL = 0, ///< Output level corresponding to error messages.
         WARNING_LVL = 1, ///< Output level corresponding to warning messages.
-        VERBOSE_LVL = 2, ///< Output level corresponding to more verbose messages.
-        NORMAL_LVL = 3, ///< Output level corresponding to usual informative messages.
-        DEBUG_LVL = 4 /*!< Output level corresponding to debug messages. If the output
-                       level is set to this, all types of messages will be printed. */
+        NORMAL_LVL = 2, ///< Output level corresponding to usual informative messages.
+        VERBOSE_LVL = 3, ///< Output level corresponding to more verbose messages.
+        DEBUG_LVL = 4/*!< Output level corresponding to debug messages. If the output
+                           level is set to this, all types of messages will be printed. */
     };
 
     /**
@@ -91,6 +95,12 @@ public:
      * @brief Stops the log.
      */
     static void Stop ();
+
+    /**
+     * @brief Used to get the current output level of the logger.
+     * @return Log::OutputLevel value of the corresponding level.
+     */
+    static OutputLevel GetOutputLevel () { return mInstance -> mLevel; }
 
     /**
      * @brief Used to output debugging messages.

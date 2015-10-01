@@ -68,7 +68,21 @@ void ACSRelay::AddPeer ( PeerConnection *plugin)
         return;
     }
 
-    Log::v() << "Adding plugin " << plugin -> Name() <<  " (" << host << ":" << plugin -> GetSocket () -> RemotePort () << "). " << "Listening on local UDP port " << plugin -> GetSocket() -> LocalPort() << ".";
+    if ( Log::GetOutputLevel() >= Log::VERBOSE_LVL )
+    {
+        // Check if the PeerConnection has an UDP socket. If so,
+        // it is a simple plugin.
+        if (  dynamic_cast<UDPSocket*>(plugin -> GetSocket()) != NULL )
+        {
+            Log::v() << "Adding new plugin " << plugin -> Name() <<  " (" << host << ":" << plugin -> GetSocket () -> RemotePort () << "). " << "Listening on local UDP port " << plugin -> GetSocket() -> LocalPort() << ".";
+        }
+        else
+        {
+            // If it has a TCP socket (the only other option), it is a downstream
+            // instance of ACSRelay.
+            Log::v() << "Adding new downstream relay " << plugin -> Name() <<  " (" << host << ":" << plugin -> GetSocket () -> RemotePort () << "). " << "Listening on local TCP port " << plugin -> GetSocket() -> LocalPort() << ".";
+        }
+    }
 
     if ( plugin -> GetSocket () -> Fd () > mMaxFd )
         mMaxFd = plugin -> GetSocket () -> Fd ();
@@ -129,6 +143,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         {
             if ( p -> second == plugin )
             {
+                Log::v () << "TCP read error from " << plugin -> Name() << ". Closing connection and removing downstream relay.";
                 delete p -> second;
                 mPeers.erase( p -> first );
                 break;
@@ -137,7 +152,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         return;
     }
 
-    Log::d() << "Caught message from " << plugin -> Name () << "!\n" << Log::Packet ( msg, n );
+    Log::d() << "Caught message from " << plugin -> Name () << "!" << Log::Packet ( msg, n );
 
     // Only relay packets that can actually be sent by a plugin.
     // Everything else must be bogus.
@@ -153,7 +168,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         case ACSProtocol::ACSP_KICK_USER:
             break;
         default:
-            Log::v() << "Unknown or incorrect packet. Dropping it!";
+            Log::v () << "Received an invalid packet from plugin " << plugin -> Name() << ". Dropping.";
             return;
     }
 
@@ -194,6 +209,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
                 {
                     Log::d () << "Set mRequestedInterval to " << ri << " ms.";
                     mRequestedInterval = ri;
+                    Log::v () << "Car update interval set to " << ri << " ms.";
                 }
             }
         }
@@ -237,7 +253,8 @@ void ACSRelay::RelayFromServer()
             // Be that true, it means it has closed the TCP socket, so we
             // have to do the same, which means this ACSRelay instance has no
             // purpose.
-            Log::e() << "Read error. Has the upstream ACSRelay closed?";
+            Log::e () << "Couldn't read from TCP socket. Has the upstream ACSRelay closed?";
+            Log::e () << "Exiting program...";
             exit ( 0 );
         }
         else
@@ -248,7 +265,7 @@ void ACSRelay::RelayFromServer()
         }
     }
 
-    Log::d() << "Caught message from  server!\n" << Log::Packet ( msg, n );
+    Log::d() << "Caught message from  server!" << Log::Packet ( msg, n );
 
     // Only relay packets that can actually be sent by the server.
     // Everything else must be bogus.
@@ -270,7 +287,7 @@ void ACSRelay::RelayFromServer()
         case ACSProtocol::ACSP_CLIENT_EVENT:
             break;
         default:
-            Log::v() << "Unknown or incorrect packet. Dropping it!";
+            Log::v () << "Received an invalid packet from the server. Dropping it.";
             return;
     }
 
@@ -353,7 +370,7 @@ void ACSRelay::RelayFromServer()
         // Send the ACSP_REALTIMEPOS_INTERVAL packet to the server:
         mServerSocket -> Send ( msg, 3 );
 
-        Log::d () << "Sent packet to server:\n" << Log::Packet ( msg, 3 );
+        Log::d () << "Sent packet to server:" << Log::Packet ( msg, 3 );
     }
 }
 
@@ -363,30 +380,34 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
 
     PeerConnection* plugin;
     TCPSocket* tcp_socket;
+    std::string incoming_relay_name;
 
     if ( mLocalPort == 0 || mRemotePort == 0 )
     {
-        Log::e () << "Trying to start non-configured relay. Aborting...";
+        Log::e () << "Invalid port configuration. Check the settings file is written properly.";
+        Log::e () << "Exiting program...";
         exit ( 2 );
     }
+
+    Log::i () << "Relay starting...";
 
     switch ( mServerType )
     {
         case AC:
             mServerSocket = new UDPSocket ( mLocalPort );
-            Log::v () << "Relay starting. Listening for messages from server on local UDP port " << mLocalPort << ".";
+            Log::v () << "Listening on local UDP port " << mLocalPort << " for messages from the server...";
             break;
         case RELAY:
             tcp_socket = new TCPSocket ( mHost, mRemotePort );
-            Log::v() << "Relay starting. Trying to connect with another relay (" << mHost << ":" << mRemotePort << ") via TCP" << "...";
+            Log::v () << "Trying to connect with another relay (" << mHost << ":" << mRemotePort << ") via TCP" << "...";
 
             if ( tcp_socket -> Connect ( kTCPTimeout ) >= 0 )
             {
-                Log::v() << " Connected!";
+                Log::v () << "Connected!";
             }
             else
             {
-                Log::v() << " Failed! ACSRelay is closing.";
+                Log::v () << "Failed! ACSRelay is closing.";
                 exit ( 1 );
             }
             mServerSocket = reinterpret_cast<Socket*> ( tcp_socket );
@@ -397,8 +418,10 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
     if ( mRelayPort != 0 )
     {
         mRelaySocket = new TCPSocket ( TCPSocket::SERVER, mRelayPort );
-        Log::v() << "Listening for messages from other relays on local TCP port " << mRelayPort << ".";
+        Log::v () << "Configured as a ACSRelay server. Listening for messages from other relays on local TCP port " << mRelayPort << ".";
     }
+
+    Log::i () << "Relay started!";
 
 
     if ( mServerSocket -> Fd () > mMaxFd )
@@ -412,8 +435,6 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
     {
         p -> second -> SetCarUpdateInterval ( 0 );
     }
-
-    Log::i() << "Relay started.";
 
     while ( 1 )
     {
@@ -458,7 +479,16 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
                         // Allow TCP connection and add it to our downstream peer list.
 
                         tcp_socket = new TCPSocket ( TCPSocket::FROM_FD, mRelaySocket -> Accept() );
-                        plugin = new PeerConnection ( "RELAY", reinterpret_cast<Socket*> ( tcp_socket ) );
+
+                        // Generate a unique identifier for the newly accepted ACSRelay connection
+                        // based on the current size of the peer list.
+                        //
+                        // Note: This isn't required to be unique. However, it's preferrable for
+                        // logging purposes.
+                        incoming_relay_name = "RELAY_";
+                        incoming_relay_name += int( mPeers.size() );
+
+                        plugin = new PeerConnection ( incoming_relay_name, reinterpret_cast<Socket*> ( tcp_socket ) );
                         AddPeer ( plugin );
                     }
                     else
