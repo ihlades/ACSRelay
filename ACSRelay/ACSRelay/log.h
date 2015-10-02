@@ -94,7 +94,11 @@ public:
      * @brief Used to retrieve an instance to the Log instance.
      * @return The only constructed Log object in existence... ever.
      */
-    static Log& GetLogger () { static Log instance; return instance; }
+    static Log& GetLogger ()
+    {
+        static Log instance;
+        return instance;
+    }
 
     /**
      * @brief Used to get the current output level of the logger.
@@ -232,7 +236,6 @@ public:
 private:
     Log ();
     Log ( const enum OutputLevel level, const std::string logfile );
-    ~Log ();
 
     /**
      * @brief The default verbosity of the log functions.

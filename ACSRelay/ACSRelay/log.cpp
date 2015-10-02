@@ -72,13 +72,6 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
         std::cout << " Writing to \"" << mLogFilename << "\" as well.";
 }
 
-Log::~Log ()
-{
-    if ( mLogFile )
-        mLogFile -> close ();
-    delete mLogFile;
-}
-
 Log& Log::d ()
 {
     time_t timer;
