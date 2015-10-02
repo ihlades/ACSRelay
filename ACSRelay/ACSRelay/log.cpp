@@ -25,27 +25,33 @@
 #include <time.h>
 #include <wchar.h>
 
-const std::string Log::DEFAULT_LOG_FILE =  "acsrelay.log.txt";
+std::string Log::_log_file =  "acsrelay.log.txt";
 const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL_LVL;
 
-Log* Log::mInstance = NULL;
-
-Log::Log () :
-    mLogFile(NULL)
+Log::Log ()
+    : mOutput(NULL),
+      mLogFile(NULL),
+#ifdef _DEBUG
+      mLevel(DEBUG_LVL),
+#else
+      mLevel(DEFAULT_LOG_LEVEL),
+#endif
+      mRequestedLevel(NORMAL_LVL),
+      mLogFilename(_log_file),
+      mFileOutputEnabled(false),
+      mTreatWarningsAsErrors(false)
 {
-    Log ( DEFAULT_LOG_LEVEL, DEFAULT_LOG_FILE );
+#ifdef _DEBUG
+    Log ( DEBUG_LVL, _log_file );
+#else
+    Log ( DEFAULT_LOG_LEVEL, _log_file );
+#endif
 }
 
 Log::Log ( const enum OutputLevel level, const std::string logfile )
+    : mLogFilename( logfile )
 {
-    mLogFile = NULL;
-    mLevel = level;
-    mLogFilename = logfile;
-    mFileOutputEnabled = false;
-
     mOutput = &std::cout;
-
-    mTreatWarningsAsErrors = false;
 
     if ( mLogFilename != "" )
     {
@@ -61,30 +67,16 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
         }
     }
 
+    std::cout << "Log opened.";
+    if ( mFileOutputEnabled )
+        std::cout << " Writing to \"" << mLogFilename << "\" as well.";
 }
 
 Log::~Log ()
 {
-    mLogFile -> close ();
+    if ( mLogFile )
+        mLogFile -> close ();
     delete mLogFile;
-}
-
-void Log::Start ()
-{
-    Start ( DEFAULT_LOG_LEVEL, DEFAULT_LOG_FILE );
-}
-
-void Log::Start ( const enum OutputLevel level, const std::string logfile )
-{
-    if ( mInstance == NULL )
-    {
-        mInstance = new Log ( level, logfile );
-    }
-}
-
-void Log::Stop ()
-{
-    delete mInstance;
 }
 
 Log& Log::d ()
@@ -97,20 +89,20 @@ Log& Log::d ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = DEBUG_LVL;
-    mInstance -> mOutput = &std::cout;
+    GetLogger().mRequestedLevel = DEBUG_LVL;
+    GetLogger().mOutput = &std::cout;
 
-    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    if ( GetLogger().mRequestedLevel <= GetLogger().mLevel )
     {
-        *( mInstance -> mOutput ) << "\n(D): ";
+        *( GetLogger().mOutput ) << "\n(D): " << std::flush;
 
-        if ( mInstance -> mFileOutputEnabled )
+        if ( GetLogger().mFileOutputEnabled )
         {
-            *( mInstance -> mLogFile ) << "\n(" << buffer << ") D/ ";
+            *( GetLogger().mLogFile ) << "\n(" << buffer << ") D/ " << std::flush;
         }
     }
 
-    return *mInstance;
+    return GetLogger();
 }
 
 Log& Log::e ()
@@ -123,20 +115,20 @@ Log& Log::e ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = ERROR_LVL;
-    mInstance -> mOutput = &std::cerr;
+    GetLogger().mRequestedLevel = ERROR_LVL;
+    GetLogger().mOutput = &std::cerr;
 
-    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    if ( GetLogger().mRequestedLevel <= GetLogger().mLevel )
     {
-        *( mInstance -> mOutput ) << "\n(E): ";
+        *( GetLogger().mOutput ) << "\n(E): ";
 
-        if ( mInstance -> mFileOutputEnabled )
+        if ( GetLogger().mFileOutputEnabled )
         {
-            *( mInstance -> mLogFile ) << "\n(" << buffer << ") E/ ";
+            *( GetLogger().mLogFile ) << "\n(" << buffer << ") E/ ";
         }
     }
 
-    return *mInstance;
+    return GetLogger();
 }
 
 Log& Log::i ()
@@ -149,20 +141,20 @@ Log& Log::i ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = NORMAL_LVL;
-    mInstance -> mOutput = &std::cout;
+    GetLogger().mRequestedLevel = NORMAL_LVL;
+    GetLogger().mOutput = &std::cout;
 
-    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    if ( GetLogger().mRequestedLevel <= GetLogger().mLevel )
     {
-        *( mInstance -> mOutput ) << "\n(I): ";
+        *( GetLogger().mOutput ) << "\n(I): ";
 
-        if ( mInstance -> mFileOutputEnabled )
+        if ( GetLogger().mFileOutputEnabled )
         {
-            *( mInstance -> mLogFile ) << "\n(" << buffer << ") I/ ";
+            *( GetLogger().mLogFile ) << "\n(" << buffer << ") I/ ";
         }
     }
 
-    return *mInstance;
+    return GetLogger();
 }
 
 Log& Log::v ()
@@ -175,20 +167,20 @@ Log& Log::v ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = VERBOSE_LVL;
-    mInstance -> mOutput = &std::cout;
+    GetLogger().mRequestedLevel = VERBOSE_LVL;
+    GetLogger().mOutput = &std::cout;
 
-    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    if ( GetLogger().mRequestedLevel <= GetLogger().mLevel )
     {
-        *( mInstance -> mOutput ) << "\n(V): ";
+        *( GetLogger().mOutput ) << "\n(V): ";
 
-        if ( mInstance -> mFileOutputEnabled )
+        if ( GetLogger().mFileOutputEnabled )
         {
-            *( mInstance -> mLogFile ) << "\n(" << buffer << ") V/ ";
+            *( GetLogger().mLogFile ) << "\n(" << buffer << ") V/ ";
         }
     }
 
-    return *mInstance;
+    return GetLogger();
 }
 
 Log& Log::w ()
@@ -201,24 +193,24 @@ Log& Log::w ()
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
 
-    mInstance -> mRequestedLevel = WARNING_LVL;
+    GetLogger().mRequestedLevel = WARNING_LVL;
 
-    if ( mInstance -> mTreatWarningsAsErrors )
-        mInstance -> mOutput = &std::cerr;
+    if ( GetLogger().mTreatWarningsAsErrors )
+        GetLogger().mOutput = &std::cerr;
     else
-        mInstance -> mOutput = &std::cout;
+        GetLogger().mOutput = &std::cout;
 
-    if ( mInstance -> mRequestedLevel <= mInstance -> mLevel )
+    if ( GetLogger().mRequestedLevel <= GetLogger().mLevel )
     {
-        *( mInstance -> mOutput ) << "\n(W): ";
+        *( GetLogger().mOutput ) << "\n(W): ";
 
-        if ( mInstance -> mFileOutputEnabled )
+        if ( GetLogger().mFileOutputEnabled )
         {
-            *( mInstance -> mLogFile ) << "\n(" << buffer << ") W/ ";
+            *( GetLogger().mLogFile ) << "\n(" << buffer << ") W/ ";
         }
     }
 
-    return *mInstance;
+    return GetLogger();
 }
 
 Log& Log::operator<< ( const std::string &log )
@@ -331,7 +323,12 @@ Log& Log::operator << ( const _log_manip<T1, T2> &manip )
 
 void Log::SetOutputLevel ( const enum OutputLevel level )
 {
-    mInstance -> mLevel = level;
+    GetLogger().mLevel = level;
+}
+
+void Log::SetOutputFile ( const std::string fn )
+{
+    _log_file = fn;
 }
 
 std::string Log::_log_packet ( char* msg, long len )

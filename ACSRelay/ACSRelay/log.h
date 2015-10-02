@@ -58,11 +58,20 @@ private:
     };
     
 public:
+    /**
+     * @brief std::codecvt implementation with a public destructor.
+     */
     template <class internT, class externT, class stateT>
     struct codecvt : std::codecvt<internT,externT,stateT>
     { ~codecvt(){} };
 
+    /**
+     * @brief Used to convert from UTF-16 to standard char.
+     */
     typedef std::wstring_convert<codecvt<char16_t,char,std::mbstate_t>,char16_t> convert16;
+    /**
+     * @brief Used to convert from UTF-32 to standard char.
+     */
     typedef std::wstring_convert<codecvt<char32_t,char,std::mbstate_t>,char32_t> convert32;
     /**
      * @brief Possible levels of verbosity for the log functions.
@@ -82,25 +91,16 @@ public:
     };
 
     /**
-     * @brief Starts the log.
+     * @brief Used to retrieve an instance to the Log instance.
+     * @return The only constructed Log object in existence... ever.
      */
-    static void Start ();
-    /**
-     * @brief Starts the log.
-     * @param level Desired output level.
-     * @param logfile Filename of the log file in which to output messages.
-     */
-    static void Start ( const enum OutputLevel level, const std::string logfile );
-    /**
-     * @brief Stops the log.
-     */
-    static void Stop ();
+    static Log& GetLogger () { static Log instance; return instance; }
 
     /**
      * @brief Used to get the current output level of the logger.
      * @return Log::OutputLevel value of the corresponding level.
      */
-    static OutputLevel GetOutputLevel () { return mInstance -> mLevel; }
+    static OutputLevel GetOutputLevel () { return GetLogger().mLevel; }
 
     /**
      * @brief Used to output debugging messages.
@@ -213,32 +213,45 @@ public:
      * @return Manipulator object that will be used by the Log.
      */
     static _log_manip<char*, long> Packet ( char* msg, long len );
-
-    /**
-     * @brief The default verbosity of the log functions.
-     */
-    const static enum OutputLevel DEFAULT_LOG_LEVEL;
-    /**
-     * @brief The default filename of the log file.
-     */
-    const static std::string DEFAULT_LOG_FILE;
     /**
      * @brief Used to set the output level of the logger.
      * @param level Desired output level.
      */
     static void SetOutputLevel ( const enum OutputLevel level );
+    /**
+     * @brief Used to change the log file.
+     * This must be called before logging any data, otherwise
+     * it will have no effect whatsoever. As the Log does not
+     * support switching from one log file to another on-the-fly,
+     * the first log file that is opened is the one that will be
+     * used for the rest of the execution.
+     * @param fn Path to the new log file name.
+     */
+    static void SetOutputFile ( const std::string fn );
     
 private:
     Log ();
     Log ( const enum OutputLevel level, const std::string logfile );
     ~Log ();
 
+    /**
+     * @brief The default verbosity of the log functions.
+     */
+    const static enum OutputLevel DEFAULT_LOG_LEVEL;
+    /**
+     * @brief The initial filename of the log file.
+     */
+    static std::string _log_file;
+
+    // SINGLETON:
+
+    Log (Log const&) = delete;
+    void operator=(Log const&) = delete;
+
     template<class T1, class T2>
     friend class _log_manip;
 
     static std::string _log_packet ( char* msg, long len );
-    
-    static Log* mInstance;
     
     std::ostream *mOutput;
     std::ofstream *mLogFile;

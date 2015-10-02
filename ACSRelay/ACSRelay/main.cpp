@@ -39,24 +39,20 @@ int main(int argc, char **argv)
     relay = ACSRelay::Build ( config -> RelayConfiguration() );
 
 #ifdef _WIN32
+    // If we're running on Windows we must
+    // register our application to WinSockAPI...
     WSADATA wsadata;
     WSAStartup ( MAKEWORD ( 2, 2 ), &wsadata );
 #endif
-
-    Log::Start ( config -> LogLevel(), config -> LogFile() );
     
     Log::i() << SW_NAME << " version " << SW_VERSION << ".";
     Log::d() << "Debug output is enabled.";
-
-    //    Log::v () << "Using configuration file \"" << params -> ConfigFilename() << "\"";
     
     delete config;
     
     relay -> Start ();
     
     delete relay;
-    
-    Log::Stop();
     
     return 0;
 }

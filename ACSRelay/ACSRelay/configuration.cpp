@@ -20,6 +20,7 @@
 #include "configuration.h"
 #include "INIReader.h"
 #include "software.h"
+#include "log.h"
 
 #include <iostream>
 #include <getopt.h>
@@ -29,7 +30,6 @@
 Configuration::Configuration ()
 	: mConfigFilename(DEFAULT_CFG_FILE),
       mRelay {"127.0.0.1", 0, 0, 0, AUTO},
-      mLogFile(Log::DEFAULT_LOG_FILE),
 #ifdef _DEBUG
       mLogLevel(Log::DEBUG_LVL)
 #else
@@ -123,15 +123,15 @@ void Configuration::ReadArguments ( int argc, char **argv )
                         }
                         else if ( strlen ( optarg ) == 0 )
                         {
-                            mLogFile = "";
+                            Log::SetOutputFile("");
                         }
                         else
                         {
-                            mLogFile = optarg;
+                            Log::SetOutputFile(optarg);
                         }
                         break;
                     case 9:
-                        mLogFile = "";
+                        Log::SetOutputFile("");
                         break;
                     case 10:
                         if ( mLogLevel < Log::VERBOSE_LVL )
