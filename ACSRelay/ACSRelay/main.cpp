@@ -45,8 +45,8 @@ int main(int argc, char **argv)
     WSAStartup ( MAKEWORD ( 2, 2 ), &wsadata );
 #endif
     
-    Log::i() << SW_NAME << " version " << SW_VERSION << ".";
-    Log::d() << "Debug output is enabled.";
+    Log::i() << SW_NAME << " v" << SW_VERSION;
+    Log::d() << "Debug version"; // This will only get logged if we're running a debug version.
     
     delete config;
     

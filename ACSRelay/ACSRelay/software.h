@@ -24,12 +24,9 @@
 #define SW_DESCRIPTION "Assetto Corsa server plugin relay. Use it to connect more than one UDP plugin to an Assetto Corsa game server."
 
 #define RAW_VERSION "1.0"
+#define VERSION_CODENAME "Albatross"
 
-#ifdef DEBUG
-    #define SW_VERSION RAW_VERSION" (debug)"
-#else
-    #define SW_VERSION RAW_VERSION
-#endif
+#define SW_VERSION RAW_VERSION" \"" VERSION_CODENAME"\""
 
 #define DEFAULT_CFG_FILE "settings.ini"
 
