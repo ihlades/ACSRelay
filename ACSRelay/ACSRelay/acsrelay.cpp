@@ -107,20 +107,7 @@ void ACSRelay::AddPeer ( PeerConnection *plugin)
 
 void ACSRelay::AddPeer ( Configuration::PluginParams params )
 {
-    PeerConnection *plugin;
-
-    if ( params.host == "" )
-    {
-        // INCORRECT HOST AND/OR PORT FOR PLUGIN
-        return;
-    }
-
-    Log::v() << "Adding new plugin " << params.name <<  " (" << params.host << ":" << params.remote_port << "). " << "Listening on local UDP port " << params.local_port << ".";
-
-    plugin = new PeerConnection ( params.name, params.host, params.local_port, params.remote_port );
-
-    AddPeer ( plugin );
-
+    AddPeer ( new PeerConnection ( params.name, params.host, params.local_port, params.remote_port ) );
 }
 
 void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )

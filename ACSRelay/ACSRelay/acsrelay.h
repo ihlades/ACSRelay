@@ -54,6 +54,9 @@ public:
      * returns a pointer to it.
      */
     static ACSRelay* Build ( Configuration::RelayParams params );
+    /**
+     * @brief ACSRelay destructor.
+     */
     virtual ~ACSRelay ();
     
     // METHODS
@@ -93,7 +96,7 @@ public:
 
     /**
      * @brief Constructs and adds plugins based on a list of PluginParams.
-     * @param plugins std::list of Configuration::PluginParams.
+     * @param plugin std::list of Configuration::PluginParams.
      */
     void AddPeer ( Configuration::PluginParams plugin );
     /**
@@ -123,8 +126,6 @@ private:
      */
     void RelayFromServer ();
     
-    void OutputPacket ( const char* msg, long n );
-    
     // VARS
     
     static ACSRelay* mInstance;
@@ -145,8 +146,4 @@ private:
     uint16_t mSetInterval;
     
     const static unsigned int kTCPTimeout = 30;
-    
-#ifdef DEBUG
-    std::ofstream dOut;
-#endif
 };
