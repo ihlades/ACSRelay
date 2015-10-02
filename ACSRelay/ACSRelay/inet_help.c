@@ -144,7 +144,7 @@ int inet_pton6(const char *src, void *dst)
          * Since some memmove()'s erroneously fail to handle
          * overlapping regions, we'll do the shift by hand.
          */
-        const int n = tp - colonp;
+        const int n = (int)(tp - colonp);
 
         if (tp == endp)
             return 0;
