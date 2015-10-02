@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     ACSRelay *relay;
     Configuration *config = new Configuration ();
 
-    config -> ReadArguments ( argc, argv );
+    config -> ReadParameters ( argc, argv );
     config -> ReadSettingsFile ();
 
     relay = ACSRelay::Build ( config -> RelayConfiguration() );

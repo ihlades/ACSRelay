@@ -82,7 +82,7 @@ public:
      * @param argc Number of command line arguments.
      * @param argv Command line arguments character arrays.
      */
-    void ReadArguments ( int argc, char **argv );
+    void ReadParameters ( int argc, char **argv );
     /**
      * @brief Reads configuration from the INI settings file.
      */

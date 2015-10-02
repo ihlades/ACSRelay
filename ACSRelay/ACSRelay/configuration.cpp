@@ -42,7 +42,7 @@ Configuration::~Configuration()
 {
 }
 
-void Configuration::ReadArguments ( int argc, char **argv )
+void Configuration::ReadParameters ( int argc, char **argv )
 {
     extern char* optarg;
     int c;
