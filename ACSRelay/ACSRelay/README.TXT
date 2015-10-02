@@ -182,16 +182,16 @@ There are several command line parameters that ACSRelay reads. They all have pri
                                         | server.
 ----------------------------------------+
                                         | Examples:
-       --local-port <LOCAL_PORT>        |               -lp 9999
-                                        |               --local-port 65022
+       --local-port <LOCAL_PORT>        |               ACSRelay.exe -lp 9999
+                                        |               ACSRelay.exe --local-port 65022
 ----------------------------------------+------------------------------------
                                         | UDP port on which ACSRelay will
            -sp <REMOTE_PORT>            | send messages towards the
                                         | server.
 ----------------------------------------+
                                         | Examples:
-      --server-port <REMOTE_PORT>       |               -sp 9999
-                                        |               --server-port 65022
+      --server-port <REMOTE_PORT>       |               ACSRelay.exe -sp 9999
+                                        |               ACSRelay.exe --server-port 65022
 ----------------------------------------+------------------------------------
                                         | TCP port on which ACSRelay will
             -rp <RELAY_PORT>            | listen for connections from
@@ -201,16 +201,17 @@ There are several command line parameters that ACSRelay reads. They all have pri
                                         | will have the role of a server
                                         |
         --relay-port <RELAY_PORT>       | Examples:
-                                        |               -rp 9999
-                                        |               --relay-port 65022
+                                        |               ACSRelay.exe -rp 9999
+                                        |               ACSRelay.exe --relay-port 65022
 ----------------------------------------+------------------------------------
                                         | Location of the INI file
             -c <CONFIG_FILE>            | to be used.
                                         |
 ----------------------------------------+ Example:
-                                        |           -c "acsrelay.ini"
-       --config-file <CONFIG_FILE>      |           --config-file "settings.ini"
+                                        |           ACSRelay.exe -c "acsrelay.ini"
+       --config-file <CONFIG_FILE>      |           ACSRelay.exe --config-file "settings.ini"
                                         |
+                                        | * The default settings file is "settings.ini"
 ----------------------------------------+------------------------------------
                                         | Adds a plugin with the specified
                                         | parameters. Can be used multiple
@@ -224,8 +225,38 @@ There are several command line parameters that ACSRelay reads. They all have pri
              --add-plugin               |               in INI file
   <NAME>:<ADDRESS>:<OUT_PORT>:<IN_PORT> |
                                         | Examples:
-                                        |       -P MR:127.0.0.1:9555:9666
-                                        |       --plugin PLUGIN_1:10.0.0.1:1234:5678
+                                        |       ACSRelay.exe -P MR:127.0.0.1:9555:9666
+                                        |       ACSRelay.exe --plugin PLUGIN_1:10.0.0.1:1234:5678
+----------------------------------------+------------------------------------
+                                        | Instructs ACSRelay to use LOG_FILE
+                                        | to write log messages to disk.
+                                        | An empty string disables the log file,
+                                        | and is equivalent to the --no-log-file
+         --log-file <LOG_FILE>          | option.
+                                        |
+                                        | Examples:
+                                        |               ACSRelay.exe --log-file "log.txt"
+                                        |               ACSRelay.exe --log-file ""
+                                        |
+                                        | * The default log file is "acsrelay.log.txt"
+----------------------------------------+------------------------------------
+                                        | Disables writing the log messages
+                                        | to the log file.
+                                        | It is equivalent to --log-file ""
+             --no-log-file              |
+                                        | Example:
+                                        |               ACSRelay.exe --no-log-file
+                                        |
+                                        | * By default, log file output is enabled
+----------------------------------------+------------------------------------
+                                        | Prints more detailed information
+               --verbose                | to the screen and the log file
+                                        | (if log file output is enabled)
+----------------------------------------+
+                                        | Example:
+                   -v                   |               ACSRelay.exe --verbose
+                                        |               ACSRelay.exe -v
+
 
 +--------------------------+
 | 3. Common usage scenario |
