@@ -45,8 +45,18 @@ Configuration::~Configuration()
 void Configuration::ReadParameters ( int argc, char **argv )
 {
     extern char* optarg;
+    extern int opterr, optint, optopt;
     int c;
-    int optind;
+    int opt;
+
+    opterr = 0;
+
+    static struct option log_options[] {
+        {"no-log-file",     required_argument,  0,  1 },
+        {"log-file",        required_argument,  0,  'l' },
+        {"verbose",         no_argument,        0,  'v' },
+        {0,                 0,                  0,  0 }
+    };
 
     static struct option long_options[] = {
         {"local-port",      required_argument,  0,  0 },
@@ -55,17 +65,48 @@ void Configuration::ReadParameters ( int argc, char **argv )
         {"sp",              required_argument,  0,  0 },
         {"relay-port",      required_argument,  0,  0 },
         {"rp",              required_argument,  0,  0 },
-        {"add-plugin",      required_argument,  0,  0 },
-        {"config-file",     required_argument,  0,  0 },
-        {"log-file",        required_argument,  0,  0 },
-        {"no-log-file",     no_argument,        0,  0 },
-        {"verbose",         no_argument,        0,  0 },
+        {"add-plugin",      required_argument,  0,  'p' },
+        {"config-file",     required_argument,  0,  'c' },
+        {"no-log-file",     required_argument,  0,  1 }, // Duplicate these three longopts
+        {"log-file",        required_argument,  0,  'l' }, // to avoid having getopt_long()
+        {"verbose",         no_argument,        0,  'v' }, // say they're unexpected.
         {0,                 0,                  0,  0 }
     };
 
-    while ( ( c = getopt_long_only ( argc, argv, "c:p:v", long_options, &optind ) ) != -1 )
-    {
+    // Parse Log settings first so we can start using the logger.
 
+    while ( ( c = getopt_long_only ( argc, argv, "v", log_options, &opt ) ) != -1 )
+    {
+        switch ( int(c) )
+        {
+            case 1:
+                Log::SetOutputFile("");
+                break;
+            case 'l':
+                if ( !optarg )
+                {
+                    break;
+                }
+                else if ( strlen ( optarg ) == 0 )
+                {
+                    Log::SetOutputFile("");
+                }
+                else
+                {
+                    Log::SetOutputFile(optarg);
+                }
+                break;
+            case 'v':
+                if ( mLogLevel < Log::VERBOSE_LVL )
+                    Log::SetOutputLevel( Log::VERBOSE_LVL );
+                break;
+        }
+    }
+
+    optind = 1;
+
+    while ( ( c = getopt_long_only ( argc, argv, ":c:p:", long_options, &opt ) ) != -1 )
+    {
         switch ( int(c) )
         {
             case 0:
@@ -77,7 +118,7 @@ void Configuration::ReadParameters ( int argc, char **argv )
                     case 1:
                         if ( !optarg )
                         {
-                            std::cerr << "(E): Argument missing for option --" << long_options[ optind ].name << std::endl;
+                            Log::e() << "Argument missing for option --" << long_options[ opt ].name;
                             break;
                         }
                         mRelay.local_port = atoi ( optarg );
@@ -86,7 +127,7 @@ void Configuration::ReadParameters ( int argc, char **argv )
                     case 3:
                         if ( !optarg )
                         {
-                            std::cerr << "(E): Argument missing for option --" << long_options[ optind ].name << std::endl;
+                            Log::e() << "Argument missing for option --" << long_options[ opt ].name;
                             break;
                         }
                         mRelay.remote_port = atoi ( optarg );
@@ -95,71 +136,29 @@ void Configuration::ReadParameters ( int argc, char **argv )
                     case 5:
                         if ( !optarg )
                         {
-                            std::cerr << "(E): Argument missing for option --" << long_options[ optind ].name << std::endl;
+                            Log::e() << "Argument missing for option --" << long_options[ opt ].name;
                             break;
                         }
                         mRelay.relay_port = atoi ( optarg );
-                        break;
-                    case 6:
-                        if ( !optarg )
-                        {
-                            std::cerr << "(E): Argument missing for option --" << long_options[ optind ].name << std::endl;
-                            break;
-                        }
-                        mRelay.plugins.push_back( PluginParamsFromString ( optarg ) );
-                        break;
-                    case 7:
-                        if ( !optarg )
-                        {
-                            std::cerr << "(E): Argument missing for option --" << long_options[ optind ].name << std::endl;
-                            break;
-                        }
-                        mConfigFilename = optarg;
-                        break;
-                    case 8:
-                        if ( !optarg )
-                        {
-                            break;
-                        }
-                        else if ( strlen ( optarg ) == 0 )
-                        {
-                            Log::SetOutputFile("");
-                        }
-                        else
-                        {
-                            Log::SetOutputFile(optarg);
-                        }
-                        break;
-                    case 9:
-                        Log::SetOutputFile("");
-                        break;
-                    case 10:
-                        if ( mLogLevel < Log::VERBOSE_LVL )
-                            mLogLevel = Log::VERBOSE_LVL;
                         break;
                 }
                 break;
             }
 
             case 'c':
-                if ( !optarg )
-                {
-                    std::cerr << "(E): Argument missing for option '-c'" << std::endl;
-                    break;
-                }
                 mConfigFilename = optarg;
                 break;
             case 'p':
-                if ( !optarg )
-                {
-                    std::cerr << "(E): Argument missing for option '-p'" << std::endl;
-                    break;
-                }
                 mRelay.plugins.push_back( PluginParamsFromString ( optarg ) );
                 break;
             case 'v':
                 if ( mLogLevel < Log::VERBOSE_LVL )
-                    mLogLevel = Log::VERBOSE_LVL;
+                    Log::SetOutputLevel( Log::VERBOSE_LVL );
+                break;
+            case ':':
+                Log::e() << "Argument missing for option '-" << static_cast<char> (optopt) << "'";
+                break;
+            case '?':
                 break;
         }
     }
