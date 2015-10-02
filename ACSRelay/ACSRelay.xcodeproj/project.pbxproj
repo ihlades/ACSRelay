@@ -17,7 +17,7 @@
 		7887CCA31B790CF80092C4C1 /* INIReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC9B1B790CF80092C4C1 /* INIReader.cpp */; };
 		7887CCA41B790CF80092C4C1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC9D1B790CF80092C4C1 /* main.cpp */; };
 		7887CCA51B790CF80092C4C1 /* peerconnection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7887CC9E1B790CF80092C4C1 /* peerconnection.cpp */; };
-		78B2B9CC1B970551009F04CF /* cmdparams.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78B2B9CB1B970551009F04CF /* cmdparams.cpp */; };
+		78B2B9CC1B970551009F04CF /* configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 78B2B9CB1B970551009F04CF /* configuration.cpp */; };
 		78B2B9CE1B982F5B009F04CF /* README.TXT in CopyFiles */ = {isa = PBXBuildFile; fileRef = 78B2B9CD1B972A59009F04CF /* README.TXT */; };
 /* End PBXBuildFile section */
 
@@ -58,8 +58,8 @@
 		7887CC9F1B790CF80092C4C1 /* peerconnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = peerconnection.h; sourceTree = "<group>"; };
 		7887CCA11B790CF80092C4C1 /* socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socket.h; sourceTree = "<group>"; };
 		78B2B9C91B970203009F04CF /* software.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = software.h; sourceTree = "<group>"; };
-		78B2B9CA1B9703AB009F04CF /* cmdparams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cmdparams.h; sourceTree = "<group>"; };
-		78B2B9CB1B970551009F04CF /* cmdparams.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cmdparams.cpp; sourceTree = "<group>"; };
+		78B2B9CA1B9703AB009F04CF /* configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configuration.h; sourceTree = "<group>"; };
+		78B2B9CB1B970551009F04CF /* configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = configuration.cpp; sourceTree = "<group>"; };
 		78B2B9CD1B972A59009F04CF /* README.TXT */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.TXT; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,8 +98,8 @@
 				7887CC991B790CF80092C4C1 /* acsrelay.cpp */,
 				784F012B1BADB20900C591FA /* log.h */,
 				784F012C1BADB67100C591FA /* log.cpp */,
-				78B2B9CB1B970551009F04CF /* cmdparams.cpp */,
-				78B2B9CA1B9703AB009F04CF /* cmdparams.h */,
+				78B2B9CB1B970551009F04CF /* configuration.cpp */,
+				78B2B9CA1B9703AB009F04CF /* configuration.h */,
 				7887CC951B790CE90092C4C1 /* inet_help.c */,
 				7887CC961B790CE90092C4C1 /* inet_help.h */,
 				7887CC9B1B790CF80092C4C1 /* INIReader.cpp */,
@@ -182,7 +182,7 @@
 				7887CC971B790CE90092C4C1 /* inet_help.c in Sources */,
 				7887CCA21B790CF80092C4C1 /* acsrelay.cpp in Sources */,
 				7887CCA41B790CF80092C4C1 /* main.cpp in Sources */,
-				78B2B9CC1B970551009F04CF /* cmdparams.cpp in Sources */,
+				78B2B9CC1B970551009F04CF /* configuration.cpp in Sources */,
 				78077F601BA94F6400B36062 /* tcpsocket.cpp in Sources */,
 				7887CCA31B790CF80092C4C1 /* INIReader.cpp in Sources */,
 			);

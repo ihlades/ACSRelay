@@ -222,13 +222,16 @@ public:
      * @brief The default filename of the log file.
      */
     const static std::string DEFAULT_LOG_FILE;
+    /**
+     * @brief Used to set the output level of the logger.
+     * @param level Desired output level.
+     */
+    static void SetOutputLevel ( const enum OutputLevel level );
     
 private:
     Log ();
     Log ( const enum OutputLevel level, const std::string logfile );
     ~Log ();
-    
-    static void SetOutputLevel ( const enum OutputLevel level );
 
     template<class T1, class T2>
     friend class _log_manip;

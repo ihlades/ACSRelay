@@ -33,27 +33,42 @@
 
 ACSRelay* ACSRelay::mInstance = NULL;
 
-ACSRelay* ACSRelay::Build ()
+ACSRelay* ACSRelay::Build ( Configuration::RelayParams params )
 {
     if ( mInstance == NULL )
     {
-        mInstance = new ACSRelay ();
+        mInstance = new ACSRelay ( params );
     }
 
     return mInstance;
 }
 
 ACSRelay::ACSRelay ()
-    : mLocalPort(-1),
-      mRemotePort(-1),
-      mRelayPort(-1),
+    : mServerType( Configuration::AUTO ),
+      mHost ("127.0.0.1"),
+      mLocalPort(0),
+      mRemotePort(0),
+      mRelayPort(0),
       mMaxFd(0),
       mServerSocket(NULL),
       mRelaySocket(NULL),
       mRequestedInterval(0),
       mSetInterval(0)
 {
+}
 
+ACSRelay::ACSRelay ( Configuration::RelayParams params )
+    : mServerType( params.server_type ),
+      mHost ( params.host ),
+      mLocalPort(params.local_port),
+      mRemotePort(params.remote_port),
+      mRelayPort(params.relay_port),
+      mMaxFd(0),
+      mServerSocket(NULL),
+      mRelaySocket(NULL),
+      mRequestedInterval(0),
+      mSetInterval(0)
+{
 }
 
 void ACSRelay::AddPeer ( PeerConnection *plugin)
@@ -90,41 +105,22 @@ void ACSRelay::AddPeer ( PeerConnection *plugin)
     mPeers[ plugin -> GetSocket() -> Fd () ] = plugin;
 }
 
-void ACSRelay::ReadConfiguration( std::string ini_fn )
+void ACSRelay::AddPeer ( Configuration::PluginParams params )
 {
-    PeerConnection *p;
-    std::vector< std::string > sections;
+    PeerConnection *plugin;
 
-    INIReader *ir = new INIReader ();
-    ir -> parse ( ini_fn );
-
-    mLocalPort = static_cast<unsigned int> ( ir -> GetInteger ( "SERVER", "RELAY_PORT", 0 ) );
-    mRemotePort = static_cast<unsigned int> ( ir -> GetInteger( "SERVER", "SERVER_PORT", 0 ) );
-    mServerType = ir -> GetString ( "SERVER", "TYPE", "AC" ) == "RELAY" ? RELAY : AC;
-    mHost = ir -> GetString ( "SERVER", "IP", "127.0.0.1" );
-
-    sections = ir -> Sections ();
-
-    for ( unsigned int i = 0; i < sections.size (); i += 1 )
+    if ( params.host == "" )
     {
-        if ( sections[ i ].substr ( 0, 7 ) == "PLUGIN_" )
-        {
-            // ADD NEW PLUGIN
-
-            p = new PeerConnection (
-                ir -> GetString ( sections[ i ], "NAME", sections[ i ] ),
-                ir -> GetString ( sections[ i ], "IP", "127.0.0.1" ),
-                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "RELAY_PORT", 0 ) ),
-                static_cast<unsigned int> ( ir -> GetInteger ( sections[ i ], "PLUGIN_PORT", 0 ) )
-            );
-
-            AddPeer ( p );
-        }
+        // INCORRECT HOST AND/OR PORT FOR PLUGIN
+        return;
     }
 
-    mRelayPort = static_cast<unsigned int> ( ir -> GetInteger ( "RELAY", "LISTEN_PORT", 0 ) );
+    Log::v() << "Adding new plugin " << params.name <<  " (" << params.host << ":" << params.remote_port << "). " << "Listening on local UDP port " << params.local_port << ".";
 
-    delete ir;
+    plugin = new PeerConnection ( params.name, params.host, params.local_port, params.remote_port );
+
+    AddPeer ( plugin );
+
 }
 
 void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
@@ -248,7 +244,7 @@ void ACSRelay::RelayFromServer()
         // We can get here either by encountering an error when reading from the socket
         // or if we're using a RELAY server.
 
-        if ( mServerType == RELAY )
+        if ( mServerType == Configuration::RELAY )
         {
             // Be that true, it means it has closed the TCP socket, so we
             // have to do the same, which means this ACSRelay instance has no
@@ -393,11 +389,12 @@ __attribute__((__noreturn__)) void ACSRelay::Start()
 
     switch ( mServerType )
     {
-        case AC:
+        case Configuration::AUTO:
+        case Configuration::AC:
             mServerSocket = new UDPSocket ( mLocalPort );
             Log::v () << "Listening on local UDP port " << mLocalPort << " for messages from the server...";
             break;
-        case RELAY:
+        case Configuration::RELAY:
             tcp_socket = new TCPSocket ( mHost, mRemotePort );
             Log::v () << "Trying to connect with another relay (" << mHost << ":" << mRemotePort << ") via TCP" << "...";
 

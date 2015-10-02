@@ -24,6 +24,7 @@
 #include "ACSProtocol.h"
 #include "socket.h"
 #include "tcpsocket.h"
+#include "configuration.h"
 
 #include <queue>
 
@@ -52,7 +53,7 @@ public:
      * If no ACSRelay object exists, it constructs one and
      * returns a pointer to it.
      */
-    static ACSRelay* Build ();
+    static ACSRelay* Build ( Configuration::RelayParams params );
     virtual ~ACSRelay ();
     
     // METHODS
@@ -89,6 +90,12 @@ public:
      * @param plugin Pointer to a PluginHandler object associated with a plugin.
      */
     void AddPeer ( PeerConnection *plugin );
+
+    /**
+     * @brief Constructs and adds plugins based on a list of PluginParams.
+     * @param plugins std::list of Configuration::PluginParams.
+     */
+    void AddPeer ( Configuration::PluginParams plugin );
     /**
      * @brief Monitors traffic between AC Server and UDP plugins.
      */
@@ -97,11 +104,12 @@ public:
 private:
     
     // CTOR
-    
+
     /**
      * @brief ACSRelay object constructor.
      */
     ACSRelay ();
+    ACSRelay ( Configuration::RelayParams params );
     
     // METHODS
     
@@ -117,19 +125,11 @@ private:
     
     void OutputPacket ( const char* msg, long n );
     
-    // ENUMS
-    
-    enum ServerType
-    {
-        RELAY,
-        AC
-    };
-    
     // VARS
     
     static ACSRelay* mInstance;
     
-    ServerType mServerType;
+    Configuration::ServerType mServerType;
     
     std::string mHost;
     unsigned int mLocalPort;

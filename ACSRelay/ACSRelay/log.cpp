@@ -41,20 +41,26 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
     mLogFile = NULL;
     mLevel = level;
     mLogFilename = logfile;
-    mFileOutputEnabled = true;
+    mFileOutputEnabled = false;
 
-    mLogFile = new std::ofstream ( mLogFilename, std::ofstream::app | std::ofstream::out );
     mOutput = &std::cout;
 
     mTreatWarningsAsErrors = false;
 
-    if ( !mLogFile -> good() || !mLogFile -> is_open() )
+    if ( mLogFilename != "" )
     {
-        mLogFile -> close();
-        mLogFile = NULL;
-        mFileOutputEnabled = false;
-        *mOutput << "E/ Couldn't open log file!";
+        mLogFile = new std::ofstream ( mLogFilename, std::ofstream::app | std::ofstream::out );
+        mFileOutputEnabled = true;
+        
+        if ( !mLogFile -> good() || !mLogFile -> is_open() )
+        {
+            mLogFile -> close();
+            mLogFile = NULL;
+            mFileOutputEnabled = false;
+            *mOutput << "(E): Couldn't open log file!";
+        }
     }
+
 }
 
 Log::~Log ()
