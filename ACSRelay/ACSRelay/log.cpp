@@ -26,7 +26,7 @@
 #include <wchar.h>
 
 std::string Log::_log_file =  "acsrelay.log.txt";
-const Log::OutputLevel Log::DEFAULT_LOG_LEVEL = NORMAL_LVL;
+Log::OutputLevel Log::_log_level = NORMAL_LVL;
 
 Log::Log ()
     : mOutput(NULL),
@@ -34,22 +34,12 @@ Log::Log ()
 #ifdef _DEBUG
       mLevel(DEBUG_LVL),
 #else
-      mLevel(DEFAULT_LOG_LEVEL),
+      mLevel(_log_level),
 #endif
       mRequestedLevel(NORMAL_LVL),
       mLogFilename(_log_file),
       mFileOutputEnabled(false),
       mTreatWarningsAsErrors(false)
-{
-#ifdef _DEBUG
-    Log ( DEBUG_LVL, _log_file );
-#else
-    Log ( DEFAULT_LOG_LEVEL, _log_file );
-#endif
-}
-
-Log::Log ( const enum OutputLevel level, const std::string logfile )
-    : mLogFilename( logfile )
 {
     mOutput = &std::cout;
 
@@ -57,13 +47,17 @@ Log::Log ( const enum OutputLevel level, const std::string logfile )
     {
         mLogFile = new std::ofstream ( mLogFilename, std::ofstream::app | std::ofstream::out );
         mFileOutputEnabled = true;
-        
+
         if ( !mLogFile -> good() || !mLogFile -> is_open() )
         {
             mLogFile -> close();
             mLogFile = NULL;
             mFileOutputEnabled = false;
             *mOutput << "(E): Couldn't open log file!";
+        }
+        else
+        {
+            *mLogFile << "Log opened.";
         }
     }
 
@@ -204,6 +198,23 @@ Log& Log::w ()
     }
 
     return GetLogger();
+}
+
+Log& Log::operator<< ( const char &log )
+{
+    if ( mRequestedLevel > mLevel )
+    {
+        return *this;
+    }
+
+    (*mOutput) << log << std::flush;
+
+    if ( mFileOutputEnabled )
+    {
+        *mLogFile << log << std::flush;
+    }
+
+    return *this;
 }
 
 Log& Log::operator<< ( const std::string &log )

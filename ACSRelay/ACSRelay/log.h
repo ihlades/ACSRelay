@@ -133,6 +133,12 @@ public:
     static Log& w ();
 
     /**
+     * @brief Used to output characters to the log.
+     * @param log Character to output in the log.
+     * @return Log object that was used to perform the task.
+     */
+    Log& operator<< ( const char &log );
+    /**
      * @brief Used to output strings to the log.
      * @param log String to output in the log.
      * @return Log object that was used to perform the task.
@@ -219,6 +225,9 @@ public:
     static _log_manip<char*, long> Packet ( char* msg, long len );
     /**
      * @brief Used to set the output level of the logger.
+     * This must be called before logging any data, otherwise
+     * it will have no effect whatsoever. As the Log does not
+     * support switching from one output level to another on-the-fly.
      * @param level Desired output level.
      */
     static void SetOutputLevel ( const enum OutputLevel level );
@@ -235,12 +244,11 @@ public:
     
 private:
     Log ();
-    Log ( const enum OutputLevel level, const std::string logfile );
 
     /**
      * @brief The default verbosity of the log functions.
      */
-    const static enum OutputLevel DEFAULT_LOG_LEVEL;
+    static enum OutputLevel _log_level;
     /**
      * @brief The initial filename of the log file.
      */
