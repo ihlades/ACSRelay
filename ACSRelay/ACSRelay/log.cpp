@@ -55,10 +55,6 @@ Log::Log ()
             mFileOutputEnabled = false;
             *mOutput << "(E): Couldn't open log file!";
         }
-        else
-        {
-            *mLogFile << "Log opened.";
-        }
     }
 
     std::cout << "Log opened.";
