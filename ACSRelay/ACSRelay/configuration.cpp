@@ -45,7 +45,7 @@ Configuration::~Configuration()
 void Configuration::ReadParameters ( int argc, char **argv )
 {
     extern char* optarg;
-    extern int opterr, optint, optopt;
+    extern int opterr, optopt;
     int c;
     int opt;
 
