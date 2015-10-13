@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ACS_PROTOCOL_H
-#define __ACS_PROTOCOL_H
+#ifndef _acsprotocol_h
+#define _acsprotocol_h
 
 /**
  * @namespace ACSProtocol
@@ -60,4 +60,4 @@ namespace ACSProtocol
     const char ACSP_ADMIN_COMMAND = 209; ///< Send message plus a UTF-32 string with the command
 }
 
-#endif // __ACS_PROTOCOL_H
+#endif // _acsprotocol_h

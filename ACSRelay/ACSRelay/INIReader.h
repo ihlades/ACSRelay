@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __INIREADER_H
-#define __INIREADER_H
+#ifndef _inireader_h
+#define _inireader_h
 
 #include <string>
 #include <map>
@@ -95,4 +95,4 @@ private:
     INIData mData;
 };
 
-#endif // __INIREADER_H
+#endif // _inireader_h

@@ -1,5 +1,5 @@
-#ifndef __INET_HELP_H
-#define __INET_HELP_H
+#ifndef _inet_help_h
+#define _inet_help_h
 
 #include <ctype.h>
 #include <stddef.h>
@@ -23,4 +23,4 @@ int inet_pton6(const char *src, void *dst);
 } // extern "C"
 #endif
 
-#endif // __INET_HELP_H
+#endif // _inet_help_h

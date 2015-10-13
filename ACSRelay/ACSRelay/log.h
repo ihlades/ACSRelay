@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LOG_H
-#define __LOG_H
+#ifndef _log_h
+#define _log_h
 
 #include <fstream>
 #include <string.h>
@@ -276,4 +276,4 @@ private:
     bool mTreatWarningsAsErrors;
 };
 
-#endif // __LOG_H
+#endif // _log_h

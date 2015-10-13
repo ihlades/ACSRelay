@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOCKET_H
-#define __SOCKET_H
+#ifndef _socket_h
+#define _socket_h
 
 #include <string>
 
@@ -126,4 +126,4 @@ protected:
     struct sockaddr_in mCa;
 };
 
-#endif // __SOCKET_H
+#endif // _socket_h

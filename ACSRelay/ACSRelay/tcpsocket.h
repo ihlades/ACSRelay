@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TCPSOCKET_H
-#define __TCPSOCKET_H
+#ifndef _tcpsocket_h
+#define _tcpsocket_h
 
 #include "socket.h"
 
@@ -112,4 +112,4 @@ private:
     int8_t mIsConnected;
 };
 
-#endif
+#endif // _tcpsocket_h

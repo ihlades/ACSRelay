@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CONFIGURATION_H
-#define __CONFIGURATION_H
+#ifndef _configuration_h
+#define _configuration_h
 
 #include <string>
 #include <list>
@@ -147,4 +147,4 @@ private:
     Log::OutputLevel mLogLevel;
 };
 
-#endif // __CONFIGURATION_H
+#endif // _configuration_h

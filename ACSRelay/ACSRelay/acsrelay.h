@@ -17,6 +17,9 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _acsrelay_h
+#define _acsrelay_h
+
 #include <string>
 
 #include "INIReader.h"
@@ -147,3 +150,5 @@ private:
     
     const static unsigned int kTCPTimeout = 30;
 };
+
+#endif // _acsrelay_h

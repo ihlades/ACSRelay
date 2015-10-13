@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PLUGIN_H
-#define __PLUGIN_H
+#ifndef _peerconnection_h
+#define _peerconnection_h
 
 #include <chrono>
 #include <string>
@@ -151,4 +151,4 @@ private:
     constexpr static float kUpdateIntervalPrecision = 0.9f;
 };
 
-#endif // __PLUGIN_H
+#endif // _peerconnection_h

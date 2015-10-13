@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOFTWARE_H
-#define __SOFTWARE_H
+#ifndef _software_h
+#define _software_h
 
 #define SW_NAME "ACSRelay"
 #define SW_DESCRIPTION "Assetto Corsa server plugin relay. Use it to connect more than one UDP plugin to an Assetto Corsa game server."
@@ -30,4 +30,4 @@
 
 #define DEFAULT_CFG_FILE "settings.ini"
 
-#endif // __SOFTWARE_H
+#endif // _software_h

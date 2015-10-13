@@ -17,8 +17,8 @@
  along with ACSRelay.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UDPSOCKET_H
-#define __UDPSOCKET_H
+#ifndef _udpsocket_h
+#define _udpsocket_h
 
 #include "socket.h"
 
@@ -77,4 +77,4 @@ private:
     UDPSocket () {}
 };
 
-#endif
+#endif // _udpsocket_h
