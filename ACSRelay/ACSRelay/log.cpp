@@ -644,7 +644,7 @@ std::string Log::_log_packet ( char* msg, long len )
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tLAPTIME: " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 1;
-            r << "\n\tCUTS: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
+            r << "\n\tCUTS: " << int( *(reinterpret_cast<uint16_t*> ( msg + index )) ); index += 1;
         }; break;
         case ACSProtocol::ACSP_NEW_CONNECTION:
         {
@@ -852,6 +852,35 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tTIME (s): " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
             r << "\n\tWAIT TIME (s): " << *(reinterpret_cast<int32_t*> ( msg + index ) ); index += 4;
         }; break;
+        case ACSProtocol::ACSP_NEXT_SESSION:
+        {
+            r << "\n\t+-----------------+";
+            r << "\n\t ACSP_NEXT_SESSION ";
+            r << "\n\t+-----------------+";
+        } break;
+        case ACSProtocol::ACSP_RESTART_SESSION:
+        {
+            r << "\n\t+--------------------+";
+            r << "\n\t ACSP_RESTART_SESSION ";
+            r << "\n\t+--------------------+";
+        } break;
+        case ACSProtocol::ACSP_ADMIN_COMMAND:
+        {
+            r << "\n\t+------------------+";
+            r << "\n\t ACSP_ADMIN_COMMAND ";
+            r << "\n\t+------------------+";
+
+            int len;
+            std::u32string utf32_string;
+            convert32 converter;
+            std::string ws;
+
+            len = msg[ 1 ];
+            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + 2), len );
+            ws = converter.to_bytes(utf32_string);
+
+            r << "\n\tCOMMAND: "<< ws;
+        } break;
         case ACSProtocol::ACSP_VERSION:
         {
             r << "\n\t+------------+";

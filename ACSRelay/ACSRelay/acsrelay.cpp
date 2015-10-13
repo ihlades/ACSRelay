@@ -149,6 +149,9 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         case ACSProtocol::ACSP_GET_SESSION_INFO:
         case ACSProtocol::ACSP_SET_SESSION_INFO:
         case ACSProtocol::ACSP_KICK_USER:
+        case ACSProtocol::ACSP_NEXT_SESSION:
+        case ACSProtocol::ACSP_RESTART_SESSION:
+        case ACSProtocol::ACSP_ADMIN_COMMAND:
             break;
         default:
             Log::v () << "Received an invalid packet from plugin " << plugin -> Name() << ". Dropping.";

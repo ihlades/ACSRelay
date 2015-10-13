@@ -55,6 +55,9 @@ namespace ACSProtocol
     const char ACSP_GET_SESSION_INFO = 204;
     const char ACSP_SET_SESSION_INFO = 205;
     const char ACSP_KICK_USER = 206;
+    const char ACSP_NEXT_SESSION = 207;
+    const char ACSP_RESTART_SESSION = 208;
+    const char ACSP_ADMIN_COMMAND = 209; ///< Send message plus a UTF-32 string with the command
 }
 
 #endif // __ACS_PROTOCOL_H
