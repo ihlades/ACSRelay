@@ -331,6 +331,21 @@ void Log::SetOutputFile ( const std::string fn )
     _log_file = fn;
 }
 
+std::string Log::ReadUTF32 ( char* s, int n )
+{
+    std::string ws;
+
+#ifdef NO_WSTRING
+    ws = std::string ( s, n );
+#else
+    std::u32string utf32_string ( reinterpret_cast<char32_t*>(s), n );
+    convert32 converter;
+    ws = converter.to_bytes ( utf32_string );
+#endif
+
+    return ws;
+}
+
 std::string Log::_log_packet ( char* msg, long len )
 {
     std::ostringstream r;
@@ -343,13 +358,10 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t ACSP_BROADCAST_CHAT ";
             r << "\n\t+-------------------+";
 
-            int namelen = msg[ 1 ];
+            int len = msg[ 1 ];
 
-            std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 2), namelen );
-            convert32 converter;
-            std::string ws = converter.to_bytes(utf32_string);
-            
-            r << L"\n\tMESSAGE: \"" << ws << "\"";
+            r << L"\n\tMESSAGE: \"" << ReadUTF32(msg + 2, len ) << "\"";
+
         }; break;
         case ACSProtocol::ACSP_CAR_INFO:
         {
@@ -358,41 +370,29 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+-------------+";
 
             int index = 1, len;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
+            std::string s;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<uint8_t*> ( msg + index )) ); index += 1;
             r << "\n\tIS CONNECTED: " << unsigned( *(reinterpret_cast<uint8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tCAR MODEL: " << ws;
+            r << "\n\tCAR MODEL: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tCAR SKIN: " << ws;
+            r << "\n\tCAR SKIN: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER NAME: " << ws;
+            r << "\n\tDRIVER NAME: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER TEAM: " << ws;
+            r << "\n\tDRIVER TEAM: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER GUID: " << ws;
+            r << "\n\tDRIVER GUID: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
         }; break;
@@ -461,16 +461,11 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+---------+";
 
             int index = 1, len;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tMESSAGE: \"" << ws << "\"";
+            r << "\n\tMESSAGE: \"" << ReadUTF32( msg + index, len ) << "\"";
             index += len * 4;
         }; break;
         case ACSProtocol::ACSP_CLIENT_EVENT:
@@ -558,20 +553,13 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+----------------------+";
 
             int len, index = 1;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER NAME: " << ws;
+            r << "\n\tDRIVER NAME: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER GUID: " << ws;
+            r << "\n\tDRIVER GUID: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -591,14 +579,9 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+----------------+";
 
             int len = msg[ 1 ];
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             len = msg[ 2 ];
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + 2), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tJSON FILENAME: " << ws;
+            r << "\n\tJSON FILENAME: " << ReadUTF32( msg + 3, len );
 
         }; break;
         case ACSProtocol::ACSP_ERROR:
@@ -653,20 +636,15 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+-------------------+";
 
             int len, index = 1;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER NAME: " << ws;
+            len = msg[ index ]; index += 1;
+            r << "\n\tDRIVER NAME: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tDRIVER GUID: " << ws;
+            len = msg[ index ]; index += 1;
+            r << "\n\tDRIVER GUID: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -685,9 +663,6 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t ACSP_NEW_SESSION ";
             r << "\n\t+----------------+";
             int len, index = 1;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tSESSION INDEX: "; r << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -695,9 +670,7 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tSESSION COUNT: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tSERVER NAME: " << ws;
+            r << "\n\tSERVER NAME: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
@@ -761,13 +734,9 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+--------------+";
 
             r << "\n\tCAR ID: " << int( *(reinterpret_cast<int8_t*> ( msg + 1 )) );
-            int namelen = msg[ 2 ];
 
-            std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 3), namelen );
-            convert32 converter;
-            std::string ws = converter.to_bytes(utf32_string);
-
-            r << L"\n\tMESSAGE: \"" << ws << "\"";
+            int len = msg[ 2 ];
+            r << "\n\tMESSAGE: " << ReadUTF32( msg + 3 , len );
         }; break;
         case ACSProtocol::ACSP_SESSION_INFO:
         {
@@ -776,9 +745,6 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+-----------------+";
 
             int len, index = 1;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             r << "\n\tPROTOCOL VERSION: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tSESSION INDEX: "; r << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
@@ -786,9 +752,7 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tSESSION COUNT: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tSERVER NAME: " << ws;
+            r << "\n\tSERVER NAME: " << ReadUTF32( msg + index, len );
             index += len * 4;
 
             len = msg[ index ]; index += 1;
@@ -836,16 +800,12 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+---------------------+";
 
             int len, index = 1;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             r << "\n\tSESSION INDEX: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
 
             len = msg[ index ]; index += 1;
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + index), len );
-            ws = converter.to_bytes(utf32_string);
-            r << "\n\tSESSION NAME: " << ws; index += len * 4;
+            r << "\n\tSESSION NAME: " << ReadUTF32( msg + index, len );
+            index += len * 4;
 
             r << "\n\tSESSION TYPE: " << int( *(reinterpret_cast<int8_t*> ( msg + index )) ); index += 1;
             r << "\n\tLAPS: " << *(reinterpret_cast<uint32_t*> ( msg + index ) ); index += 4;
@@ -871,15 +831,9 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\t+------------------+";
 
             int len;
-            std::u32string utf32_string;
-            convert32 converter;
-            std::string ws;
 
             len = msg[ 1 ];
-            utf32_string = std::u32string( reinterpret_cast<char32_t*>(msg + 2), len );
-            ws = converter.to_bytes(utf32_string);
-
-            r << "\n\tCOMMAND: "<< ws;
+            r << "\n\tCOMMAND: " << ReadUTF32( msg + 2, len );
         } break;
         case ACSProtocol::ACSP_VERSION:
         {

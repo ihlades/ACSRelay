@@ -58,6 +58,8 @@ private:
     };
     
 public:
+
+#ifndef NO_WSTRING
     /**
      * @brief std::codecvt implementation with a public destructor.
      */
@@ -73,6 +75,8 @@ public:
      * @brief Used to convert from UTF-32 to standard char.
      */
     typedef std::wstring_convert<codecvt<char32_t,char,std::mbstate_t>,char32_t> convert32;
+#endif
+    
     /**
      * @brief Possible levels of verbosity for the log functions.
      * Lower values have a higher priority. For example, if a message with
@@ -244,6 +248,14 @@ public:
     
 private:
     Log ();
+
+    /**
+     * @brief Reads a UTF-32 string from a byte array.
+     * @param s Pointer to a byte array.
+     * @param n Number of UTF-32 characters to read (each UTF-32 has 4 bytes).
+     * @return A standard string object.
+     */
+    static std::string ReadUTF32 ( char* s, int n );
 
     /**
      * @brief The default verbosity of the log functions.
