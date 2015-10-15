@@ -214,7 +214,8 @@ Configuration::PluginParams Configuration::PluginParamsFromString ( const char *
     params.name = params.host = "";
     params.remote_port = params.local_port = 0;
 
-    strncpy ( str, s, 256 );
+    strncpy ( str, s, sizeof(str) - 1 );
+    str[ sizeof(str) - 1 ] = '\0';	// Make sure str is terminated (strncpy() doesn't ensure this)
 
     p = strtok( str, ":");
 
