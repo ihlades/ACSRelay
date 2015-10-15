@@ -56,8 +56,10 @@ private:
         T1 _arg1;
         T2 _arg2;
     };
-    
+
 public:
+
+#ifndef DISABLE_PACKET_LOGS
     /**
      * @brief std::codecvt implementation with a public destructor.
      */
@@ -68,11 +70,14 @@ public:
     /**
      * @brief Used to convert from UTF-16 to standard char.
      */
-    typedef std::wstring_convert<codecvt<char16_t,char,std::mbstate_t>,char16_t> convert16;
+    typedef wstring_convert<codecvt<char16_t,char,std::mbstate_t>,char16_t> convert16;
     /**
      * @brief Used to convert from UTF-32 to standard char.
      */
     typedef std::wstring_convert<codecvt<char32_t,char,std::mbstate_t>,char32_t> convert32;
+
+#endif // DISABLE_PACKET_LOGS
+
     /**
      * @brief Possible levels of verbosity for the log functions.
      * Lower values have a higher priority. For example, if a message with
@@ -241,7 +246,7 @@ public:
      * @param fn Path to the new log file name.
      */
     static void SetOutputFile ( const std::string fn );
-    
+
 private:
     Log ();
 
@@ -263,16 +268,16 @@ private:
     friend class _log_manip;
 
     static std::string _log_packet ( char* msg, long len );
-    
+
     std::ostream *mOutput;
     std::ofstream *mLogFile;
-    
+
     enum OutputLevel mLevel;
     enum OutputLevel mRequestedLevel;
-    
+
     std::string mLogFilename;
     bool mFileOutputEnabled;
-    
+
     bool mTreatWarningsAsErrors;
 };
 
