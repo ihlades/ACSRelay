@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <unistd.h>
+#include <string.h>
 
 long TCPSocket::Send ( const char* msg, const size_t len ) const
 {
@@ -41,12 +42,12 @@ long TCPSocket::Read ( char *msg, const size_t len )
 int TCPSocket::Accept()
 {
     int retval;
-    
+
     socklen_t len = sizeof ( mCa );
     retval = accept(mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), &len );
-    
+
     mRemotePort = ntohs ( mCa.sin_port );
-    
+
     return retval;
 }
 
@@ -77,17 +78,17 @@ int TCPSocket::Connect( unsigned short timeout )
     struct timeval tv;
     char err;
     socklen_t len = sizeof ( int );
-    
+
     tv.tv_sec = timeout;
     tv.tv_usec = 0;
-    
+
     FD_ZERO ( &rd );
     FD_SET ( mSockFd, &rd );
     FD_ZERO ( &wr );
     FD_SET ( mSockFd, &wr );
-    
+
     SetBlocking ( false );
-    
+
     if ( ( status = connect ( mSockFd, reinterpret_cast<struct sockaddr*> ( &mCa ), sizeof ( mCa ) ) ) == -1 )
     {
         if ( errno != EINPROGRESS )
@@ -95,31 +96,31 @@ int TCPSocket::Connect( unsigned short timeout )
             return static_cast<int> ( status );
         }
     }
-    
+
     status = select (mSockFd + 1, &rd, &wr, NULL, &tv);
-    
+
     if ( !FD_ISSET ( mSockFd, &rd ) && !FD_ISSET ( mSockFd, &wr ) )
     {
         return -2;
     }
-    
+
     if ( getsockopt ( mSockFd, SOL_SOCKET, SO_ERROR, &err, &len ) < 0)
     {
         return -2;
     }
-    
+
     if ( err == 0 )
     {
         // TCP connection established.
         // Make the socket blocking again...
-        
+
         SetBlocking ( true );
-        
+
         // And return from the function.
-        
+
         return 0;
     }
-    
+
     return -1;
 }
 
@@ -141,28 +142,28 @@ void TCPSocket::Close ()
 TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
 {
     struct sockaddr_in sa;
-    
+
     mIsConnected = false;
-    
+
     mHost = host;
     mLocalPort = 0;
     mRemotePort = remote_port;
-    
+
     memset ( &sa, 0, sizeof ( mCa ) );
     sa.sin_family = AF_INET;
     sa.sin_addr.s_addr = htonl ( INADDR_ANY );
     sa.sin_port = htons ( mLocalPort );
-    
+
     mSockFd = socket ( AF_INET, SOCK_STREAM, 0 );
-    
+
     if ( bind ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), sizeof ( sa ) ) < 0 )
     {
         Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
     }
-    
+
     // Now save host and port information in mCa
     // to be used when sending packets to the client plugin.
-    
+
     memset ( &mCa, 0, sizeof ( mCa ) );
     mCa.sin_family = AF_INET;
     inet_pton ( AF_INET, host.c_str (), &( mCa.sin_addr ) );
@@ -172,7 +173,7 @@ TCPSocket::TCPSocket ( const std::string host, const unsigned int remote_port )
 TCPSocket::TCPSocket ( Type type, const unsigned int param )
 {
     struct sockaddr_in sa;
-    
+
     if ( type == FROM_FD )
     {
         mSockFd = param;
@@ -185,41 +186,41 @@ TCPSocket::TCPSocket ( Type type, const unsigned int param )
         else
         {
             mIsConnected = true;
-            
+
             mHost = inet_ntoa ( mCa.sin_addr );
             mRemotePort = ntohs ( mCa.sin_port );
-            
+
             addrlen = sizeof ( sa );
-            
+
             getsockname ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), &addrlen );
-            
+
             mLocalPort = ntohs ( sa.sin_port );
         }
     }
     else if ( type == SERVER )
     {
         mIsConnected = false;
-        
+
         mLocalPort = param;
         mHost = "127.0.0.1";
-        
+
         memset ( &sa, 0, sizeof ( mCa ) );
         sa.sin_family = AF_INET;
         sa.sin_addr.s_addr = htonl ( INADDR_ANY );
         sa.sin_port = htons( mLocalPort );
-        
+
         mSockFd = socket ( AF_INET, SOCK_STREAM, 0 );
-        
+
         if ( bind ( mSockFd, reinterpret_cast<struct sockaddr*> ( &sa ), sizeof ( sa ) ) < 0 )
         {
             Log::e() << "Failed to bind TCP socket for host " << mHost << ":" << mLocalPort;
         }
-        
+
         if ( listen ( mSockFd, 5 ) < 0 )
         {
             Log::e() << "Failed to listen on TCP port " << mLocalPort;
         }
-        
+
         memset ( &mCa, 0, sizeof ( mCa ) );
         mCa.sin_addr.s_addr = INADDR_NONE;
     }
