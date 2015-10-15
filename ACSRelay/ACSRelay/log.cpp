@@ -333,8 +333,12 @@ void Log::SetOutputFile ( const std::string fn )
 
 std::string Log::_log_packet ( char* msg, long len )
 {
+
     std::ostringstream r;
 
+#ifdef DISABLE_PACKET_LOGS
+	r << "\n\tPacket type: " << *(reinterpret_cast<int8_t*> ( msg ));
+#else
     switch ( *(reinterpret_cast<int8_t*> ( msg )) )
     {
         case ACSProtocol::ACSP_BROADCAST_CHAT:
@@ -348,7 +352,7 @@ std::string Log::_log_packet ( char* msg, long len )
             std::u32string utf32_string ( reinterpret_cast<char32_t*>(msg + 2), namelen );
             convert32 converter;
             std::string ws = converter.to_bytes(utf32_string);
-            
+
             r << L"\n\tMESSAGE: \"" << ws << "\"";
         }; break;
         case ACSProtocol::ACSP_CAR_INFO:
@@ -865,6 +869,8 @@ std::string Log::_log_packet ( char* msg, long len )
             r << "\n\tUnknown or corrupt packet";
         } break;
     }
+
+#endif // DISABLE_PACKET_LOGS
 
     return r.str ();
 }

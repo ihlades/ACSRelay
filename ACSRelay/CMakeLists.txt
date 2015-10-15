@@ -12,6 +12,12 @@ configure_file(
 	"${PROJECT_BINARY_DIR}/${SOURCE_DIR}/cmake_config.h"
 )
 
+option(PACKET_LOGGING "Enable logging of packet contents" TRUE)
+
+if(NOT PACKET_LOGGING)
+    add_definitions(-DDISABLE_PACKET_LOGS)
+endif()
+
 include_directories(${SOURCE_DIR})
 
 set(project_SOURCES
