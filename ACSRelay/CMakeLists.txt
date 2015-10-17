@@ -12,6 +12,11 @@ configure_file(
 	"${PROJECT_BINARY_DIR}/${SOURCE_DIR}/cmake_config.h"
 )
 
+option(NO_WSTRING "Disable wide string conversions" FALSE)
+if(NO_WSTRING)
+    add_definitions(-DNO_WSTRING)
+endif()
+
 include_directories(${SOURCE_DIR})
 
 set(project_SOURCES
