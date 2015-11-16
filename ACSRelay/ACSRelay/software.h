@@ -23,7 +23,7 @@
 #define SW_NAME "ACSRelay"
 #define SW_DESCRIPTION "Assetto Corsa server plugin relay. Use it to connect more than one UDP plugin to an Assetto Corsa game server."
 
-#define RAW_VERSION "1.0 beta 1"
+#define RAW_VERSION "1.0"
 #define VERSION_CODENAME "Albatross"
 
 #define SW_VERSION RAW_VERSION" \"" VERSION_CODENAME"\""
