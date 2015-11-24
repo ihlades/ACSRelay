@@ -171,7 +171,7 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
         {
             ri = msg[ 1 ];
             plugin -> SetCarUpdateInterval ( ri );
-
+#ifdef _ENABLE_RTPI_CHECK
             // If mSetInterval is not zero, then we know the server is online
             // and we can send the packet. Set mRequestedInterval as well, so
             // that we'll resend this packet if the server doesn't start
@@ -202,6 +202,14 @@ void ACSRelay::RelayFromPlugin ( PeerConnection* plugin )
                     Log::v () << "Car update interval set to " << ri << " ms.";
                 }
             }
+#else
+            if ( mSetInterval == 0 || ri < mSetInterval )
+            {
+                mSetInterval = ri;
+                Log::d() << "Relaying packet to server.";
+                mServerSocket -> Send ( msg, n );
+            }
+#endif
         }
     }
     // This plugin is requesting info about a car. Take notice and make sure to
@@ -284,6 +292,7 @@ void ACSRelay::RelayFromServer()
     // Send realtime position update to subscribed plugins
     if ( static_cast<int8_t> ( msg[ 0 ] ) == ACSProtocol::ACSP_CAR_UPDATE )
     {
+#ifdef _ENABLE_RTPI_CHECK
         // We've received an ACSP_CAR_UPDATE packet, so our
         // ACSP_REALTIMEPOS_INTERVAL got to the server. Take note of that.
         //
@@ -294,6 +303,7 @@ void ACSRelay::RelayFromServer()
             mSetInterval = mRequestedInterval;
             mRequestedInterval = 0;
         }
+#endif
 
         for ( auto p = mPeers.begin (); p != mPeers.end (); ++p )
         {
@@ -350,6 +360,7 @@ void ACSRelay::RelayFromServer()
         }
     }
 
+#ifdef _ENABLE_RTPI_CHECK
     // The server sent us a message so it's online. This is the right time
     // to check if we have to send it a ACSP_REALTIMEPOS_INTERVAL packet.
     if ( mRequestedInterval != 0 )
@@ -362,6 +373,7 @@ void ACSRelay::RelayFromServer()
 
         Log::d () << "Sent packet to server:" << Log::Packet ( msg, 3 );
     }
+#endif
 }
 
 __attribute__((__noreturn__)) void ACSRelay::Start()
