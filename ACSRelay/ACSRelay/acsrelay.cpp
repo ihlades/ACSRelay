@@ -69,6 +69,10 @@ ACSRelay::ACSRelay ( Configuration::RelayParams params )
       mRequestedInterval(0),
       mSetInterval(0)
 {
+    for ( auto it = params.plugins.begin(); it != params.plugins.end(); it++ )
+    {
+        AddPeer ( *it );
+    }
 }
 
 void ACSRelay::AddPeer ( PeerConnection *plugin)

@@ -31,12 +31,7 @@
 int main(int argc, char **argv)
 {
     ACSRelay *relay;
-    Configuration *config = new Configuration ();
-
-    config -> ReadParameters ( argc, argv );
-    config -> ReadSettingsFile ();
-
-    relay = ACSRelay::Build ( config -> RelayConfiguration() );
+    Configuration *config;
 
 #ifdef _WIN32
     // If we're running on Windows we must
@@ -44,6 +39,12 @@ int main(int argc, char **argv)
     WSADATA wsadata;
     WSAStartup ( MAKEWORD ( 2, 2 ), &wsadata );
 #endif
+    
+    config = new Configuration ();
+    config -> ReadParameters ( argc, argv );
+    config -> ReadSettingsFile ();
+
+    relay = ACSRelay::Build ( config -> RelayConfiguration() );
     
     Log::i() << SW_NAME << " v" << SW_VERSION;
     Log::d() << "Debug version"; // This will only get logged if we're running a debug version.
